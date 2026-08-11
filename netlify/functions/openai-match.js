@@ -6,7 +6,19 @@ exports.handler = async function(event, context) {
     }
     
     try {
-        const { cv, job } = JSON.parse(event.body);
+        // Veilig afhandelen van (eventueel base64-gecodeerde) body
+        const bodyPayload = event.isBase64Encoded 
+            ? Buffer.from(event.body, 'base64').toString('utf-8') 
+            : event.body;
+
+        const { cv, job } = JSON.parse(bodyPayload || '{}');
+
+        if (!cv || !job) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: "Vul alstublieft zowel cv als job in." })
+            };
+        }
         
         const postData = JSON.stringify({
             model: 'gpt-4o-mini',
@@ -16,9 +28,9 @@ exports.handler = async function(event, context) {
             ]
         });
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             const options = {
-                hostname: '://openai.com',
+                hostname: 'api.openai.com', // Aangepast: Alleen het domein, geen '://'
                 path: '/v1/chat/completions',
                 method: 'POST',
                 headers: {
