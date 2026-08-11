@@ -48,6 +48,19 @@
         .start-btn { display: inline-block; padding: 12px 30px; font-size: 16px; border: none; border-radius: 8px; background-color: var(--primary); color: white; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .start-btn:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
 
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .status-free { background-color: #e0f2fe; color: #0369a1; }
+        .status-pass { background-color: #dcfce7; color: #15803d; }
+        .status-expired { background-color: #fee2e2; color: #b91c1c; }
+
         /* Form */
         label { display: block; font-weight: 600; margin-bottom: 8px; margin-top: 18px; color: #334155; }
         .radio-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; background: #f8fafc; padding: 16px; border-radius: 10px; border: 1px solid #e2e8f0; }
@@ -59,9 +72,26 @@
         
         button.submit-btn { width: 100%; background-color: var(--primary); color: white; border: none; padding: 15px; font-size: 16px; font-weight: 600; border-radius: 10px; cursor: pointer; margin-top: 15px; transition: background 0.2s; }
         button.submit-btn:hover { background-color: var(--primary-hover); }
+        button.submit-btn:disabled { background-color: #94a3b8; cursor: not-allowed; }
         
         .loading { display: none; text-align: center; font-weight: 600; color: var(--primary); margin: 25px 0; }
         
+        /* Paywall Banner */
+        .paywall-banner {
+            display: none;
+            background-color: #eff6ff;
+            border: 2px solid #2563eb;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-top: 25px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+        }
+        .paywall-banner h3 { margin-top: 0; color: #1e40af; font-size: 20px; }
+        .paywall-banner p { color: #334155; margin-bottom: 15px; }
+        .pay-btn { background-color: #16a34a; color: white; border: none; padding: 14px 28px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: background 0.2s; text-decoration: none; display: inline-block; }
+        .pay-btn:hover { background-color: #15803d; }
+
         /* Results Section */
         .result-box { display: none; margin-top: 30px; border-top: 2px solid #f1f5f9; padding-top: 25px; }
         
@@ -74,7 +104,6 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); 
         }
 
-        /* Modern Styling voor CV */
         .cv-card { 
             border-left: 5px solid var(--primary); 
             background: #fafafa;
@@ -139,6 +168,10 @@
 
     <!-- Formulier -->
     <div id="applicationForm">
+        <div style="text-align: center;">
+            <span id="accessBadge" class="status-badge status-free">🎁 Gratis proefversie (1x)</span>
+        </div>
+
         <label id="lblDocType">What would you like to generate?</label>
         <div class="radio-group">
             <label class="radio-option">
@@ -163,6 +196,13 @@
         
         <button id="submitBtn" class="submit-btn" onclick="matchCV()">Generate Document(s)</button>
         
+        <!-- Paywall Melding -->
+        <div id="paywallBanner" class="paywall-banner">
+            <h3 id="pwTitle">🔒 Je gratis sessie is gebruikt!</h3>
+            <p id="pwSub">Krijg 7 dagen lang onbeperkt toegang tot het maken van CV's en sollicitatiebrieven.</p>
+            <button class="pay-btn" id="pwBtn" onclick="startPayment()">💳 Ontgrendel 7 Dagen voor €2,99</button>
+        </div>
+
         <div id="loading" class="loading">AI is analyzing and writing... Please wait.</div>
         
         <!-- Resultaten -->
@@ -197,6 +237,8 @@
 </div>
 
 <script>
+    const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_14A4gz8yo8Hn9Kn90vc3m00";
+
     const translations = {
         English: {
             title: "Welcome to CV Wizard",
@@ -215,7 +257,14 @@
             resultTitle: "Your AI Generated Content",
             lblLetterHeader: "Cover Letter",
             lblCvHeader: "Tailored CV",
-            alertFill: "Please fill in both fields."
+            alertFill: "Please fill in both fields.",
+            pwTitle: "🔒 Free Session Used!",
+            pwSub: "Get 7 days of unlimited access to generate CVs and cover letters.",
+            pwBtn: "💳 Unlock 7 Days Access for €2.99",
+            btnUsed: "Free Trial Used",
+            badgeFree: "🎁 Free Trial (1x)",
+            badgePass: "⚡ 7-Day Unlimited Access Active",
+            badgeExpired: "🔒 7-Day Access Expired"
         },
         Dutch: {
             title: "Welkom bij CV Wizard",
@@ -234,180 +283,78 @@
             resultTitle: "Jouw Gegenereerde Inhoud",
             lblLetterHeader: "Sollicitatiebrief",
             lblCvHeader: "Aangepast CV",
-            alertFill: "Vul alstublieft zowel je gegevens als de vacature in."
-        },
-        French: {
-            title: "Bienvenue sur CV Wizard",
-            sub: "Décrochez le job de vos rêves grâce à des lettres de motivation et CV personnalisés par l'IA.",
-            startBtn: "Commencer ma candidature",
-            lblDocType: "Que souhaitez-vous générer ?",
-            optBoth: "Lettre de motivation & CV sur mesure",
-            optLetter: "Lettre de motivation uniquement",
-            optCv: "CV sur mesure uniquement",
-            lblCv: "Collez votre CV actuel ou vos infos :",
-            phCv: "Expérience professionnelle, formation, compétences...",
-            lblJob: "Collez l'offre d'emploi :",
-            phJob: "Collez le texte complet de l'annonce...",
-            submitBtn: "Générer les documents",
-            loading: "L'IA analyse et rédige... Veuillez patienter.",
-            resultTitle: "Votre contenu généré par l'IA",
-            lblLetterHeader: "Lettre de motivation",
-            lblCvHeader: "CV sur mesure",
-            alertFill: "Veuillez remplir les deux champs."
-        },
-        Spanish: {
-            title: "Bienvenido a CV Wizard",
-            sub: "Consigue el trabajo de tus sueños con cartas de presentación y CVs personalizados por IA.",
-            startBtn: "Iniciar mi solicitud",
-            lblDocType: "¿Qué deseas generar?",
-            optBoth: "Ambos: Carta de Presentación y CV",
-            optLetter: "Solo Carta de Presentación",
-            optCv: "Solo CV Personalizado",
-            lblCv: "Pega tu CV actual o datos:",
-            phCv: "Experiencia laboral, educación, habilidades...",
-            lblJob: "Pega la oferta de trabajo:",
-            phJob: "Pega el texto completo de la oferta...",
-            submitBtn: "Generar Documento(s)",
-            loading: "La IA está analizando y escribiendo... Por favor espera.",
-            resultTitle: "Tu Contenido Generado por IA",
-            lblLetterHeader: "Carta de Presentación",
-            lblCvHeader: "CV Personalizado",
-            alertFill: "Por favor, rellena ambos campos."
-        },
-        German: {
-            title: "Willkommen bei CV Wizard",
-            sub: "Sichern Sie sich Ihren Traumjob mit KI-generierten Anschreiben und maßgeschneiderten Lebensläufen.",
-            startBtn: "Bewerbung starten",
-            lblDocType: "Was möchten Sie erstellen?",
-            optBoth: "Anschreiben & Maßgeschneiderter Lebenslauf",
-            optLetter: "Nur Anschreiben",
-            optCv: "Nur Maßgeschneiderter Lebenslauf",
-            lblCv: "Fügen Sie Ihren aktuellen Lebenslauf ein:",
-            phCv: "Berufserfahrung, Ausbildung, Fähigkeiten...",
-            lblJob: "Stellenbeschreibung einfügen:",
-            phJob: "Fügen Sie den vollständigen Text der Stellenanzeige ein...",
-            submitBtn: "Dokument(e) erstellen",
-            loading: "KI analysiert und schreibt... Bitte warten.",
-            resultTitle: "Ihre KI-generierten Inhalte",
-            lblLetterHeader: "Anschreiben",
-            lblCvHeader: "Maßgeschneiderter Lebenslauf",
-            alertFill: "Bitte füllen Sie beide Felder aus."
-        },
-        Turkish: {
-            title: "CV Wizard'a Hoş Geldiniz",
-            sub: "Yapay zeka destekli niyet mektupları ve özel CV'ler ile hayalinizdeki işe kavuşun.",
-            startBtn: "Başvuruyu Başlat",
-            lblDocType: "Ne oluşturmak istersiniz?",
-            optBoth: "Hem Niyet Mektubu Hem CV",
-            optLetter: "Sadece Niyet Mektubu",
-            optCv: "Sadece Özel CV",
-            lblCv: "Mevcut CV'nizi veya bilgilerinizi yapıştırın:",
-            phCv: "İş deneyimi, eğitim, beceriler...",
-            lblJob: "İş ilanını yapıştırın:",
-            phJob: "Başvurmak istediğiniz iş ilanının metnini yapıştırın...",
-            submitBtn: "Belge Oluştur",
-            loading: "Yapay zeka analiz ediyor ve yazıyor... Lütfen bekleyin.",
-            resultTitle: "Yapay Zeka Tarafından Oluşturulan İçerik",
-            lblLetterHeader: "Niyet Mektubu",
-            lblCvHeader: "Özel CV",
-            alertFill: "Lütfen her iki alanı da doldurun."
-        },
-        Greek: {
-            title: "Καλώς ήρθατε στο CV Wizard",
-            sub: "Αποκτήστε τη δουλειά των ονείρων σας με συνοδευτικές επιστολές και προσαρμοσμένα CV με AI.",
-            startBtn: "Ξεκινήστε την αίτηση",
-            lblDocType: "Τι θα θέλατε να δημιουργήσετε;",
-            optBoth: "Συνοδευτική Επιστολή & Προσαρμοσμένο CV",
-            optLetter: "Μόνο Συνοδευτική Επιστολή",
-            optCv: "Μόνο Προσαρμοσμένο CV",
-            lblCv: "Επικολήστε το τρέχον CV ή τις λεπτομέρειές σας:",
-            phCv: "Προϋπηρεσία, εκπαίδευση, δεξιότητες...",
-            lblJob: "Επικολήστε την περιγραφή της θέσης εργασίας:",
-            phJob: "Επικολήστε το πλήρες κείμενο της αγγελίας...",
-            submitBtn: "Δημιουργία Εγγράφων",
-            loading: "Η AI αναλύει και γράφει... Παρακαλώ περιμένετε.",
-            resultTitle: "Το Περιεχόμενο που Δημιουργήθηκε",
-            lblLetterHeader: "Συνοδευτική Επιστολή",
-            lblCvHeader: "Προσαρμοσμένο CV",
-            alertFill: "Παρακαλώ συμπληρώστε και τα δύο πεδία."
-        },
-        Arabic: {
-            title: "مرحبًا بك في CV Wizard",
-            sub: "احصل على وظيفة أحلامك مع خطابات التغطية والسير الذاتية المخصصة المدعومة بالذكاء الاصطناعي.",
-            startBtn: "ابدأ طلبك",
-            lblDocType: "ماذا تريد أن تنشئ؟",
-            optBoth: "خطاب تغطية وسيرة ذاتية مخصصة",
-            optLetter: "خطاب تغطية فقط",
-            optCv: "سيرة ذاتية مخصصة فقط",
-            lblCv: "الصق سيرتك الذاتية الحالية أو تفاصيلك:",
-            phCv: "الخبرة العملية، التعليم، المهارات...",
-            lblJob: "الصق الوصف الوظيفي:",
-            phJob: "الصق النص الكامل للوظيفة التي تريد التقدم إليها...",
-            submitBtn: "إنشاء المستندات",
-            loading: "الذكاء الاصطناعي يحلل ويكتب... يرجى الانتظار.",
-            resultTitle: "المحتوى المنشأ بواسطة الذكاء الاصطناعي",
-            lblLetterHeader: "خطاب التغطية",
-            lblCvHeader: "السيرة الذاتية المخصصة",
-            alertFill: "يرجى ملء كلا الحقلين."
-        },
-        Chinese: {
-            title: "欢迎使用 CV Wizard",
-            sub: "借助 AI 生成的求职信和个性化简历，轻松获得理想工作。",
-            startBtn: "开始申请",
-            lblDocType: "您想生成什么？",
-            optBoth: "求职信和定制简历",
-            optLetter: "仅求职信",
-            optCv: "仅定制简历",
-            lblCv: "粘贴您当前的简历或详细信息：",
-            phCv: "工作经验、教育背景、技能...",
-            lblJob: "粘贴职位描述：",
-            phJob: "粘贴您想申请的职位的全文...",
-            submitBtn: "生成文档",
-            loading: "AI 正在分析并编写... 请稍候。",
-            resultTitle: "AI 生成的内容",
-            lblLetterHeader: "求职信",
-            lblCvHeader: "定制简历",
-            alertFill: "请填写这两个字段。"
-        },
-        Japanese: {
-            title: "CV Wizard へようこそ",
-            sub: "AIが作成するカバーレターとカスタマイズされたCVで、理想の職を手に入れましょう。",
-            startBtn: "応募を開始する",
-            lblDocType: "何を作成しますか？",
-            optBoth: "カバーレターとCVの両方",
-            optLetter: "カバーレターのみ",
-            optCv: "カスタマイズされたCVのみ",
-            lblCv: "現在のCVまたは詳細を貼り付けてください：",
-            phCv: "職歴、学歴、スキル...",
-            lblJob: "求人情報を貼り付けてください：",
-            phJob: "応募したい求人の全文を貼り付けてください...",
-            submitBtn: "ドキュメントを生成",
-            loading: "AIが me 分析・執筆中です... お待ちください。",
-            resultTitle: "AI生成コンテンツ",
-            lblLetterHeader: "カバーレター",
-            lblCvHeader: "カスタマイズされたCV",
-            alertFill: "両方のフィールドに入力してください。"
-        },
-        Italian: {
-            title: "Benvenuto su CV Wizard",
-            sub: "Ottieni il lavoro dei tuoi sogni con lettere di presentazione e CV personalizzati dall'IA.",
-            startBtn: "Inizia la tua candidatura",
-            lblDocType: "Cosa vorresti generare?",
-            optBoth: "Lettera di presentazione e CV personalizzato",
-            optLetter: "Solo lettera di presentazione",
-            optCv: "Solo CV personalizzato",
-            lblCv: "Incolla il tuo CV attuale o i tuoi dettagli:",
-            phCv: "Esperienza lavorativa, istruzione, competenze...",
-            lblJob: "Incolla la descrizione del lavoro:",
-            phJob: "Incolla il testo completo dell'offerta di lavoro...",
-            submitBtn: "Genera documento/i",
-            loading: "L'IA sta analizzando e scrivendo... Attendere prego.",
-            resultTitle: "Il tuo contenuto generato dall'IA",
-            lblLetterHeader: "Lettera di presentazione",
-            lblCvHeader: "CV personalizzato",
-            alertFill: "Si prega di compilare entrambi i campi."
+            alertFill: "Vul alstublieft zowel je gegevens als de vacature in.",
+            pwTitle: "🔒 Je gratis sessie is gebruikt!",
+            pwSub: "Krijg 7 dagen lang onbeperkt toegang tot het maken van CV's en sollicitatiebrieven.",
+            pwBtn: "💳 Ontgrendel 7 Dagen voor €2,99",
+            btnUsed: "Gratis beurt gebruikt",
+            badgeFree: "🎁 Gratis proefversie (1x)",
+            badgePass: "⚡ 7 Dagen Onbeperkt Actief",
+            badgeExpired: "🔒 7-Dagen Toegang Verlopen"
         }
     };
+
+    window.onload = function() {
+        // Controleer of de gebruiker net succesvol heeft betaald via Stripe (retour-URL)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('paid') === 'true') {
+            grant7DaysAccess();
+            // Verwijder de parameter uit de URL voor een schone weergave
+            window.history.replaceState({}, document.title, window.location.pathname);
+        } else {
+            checkAccess();
+        }
+    };
+
+    // Controleer of de gebruiker 7-dagen toegang heeft óf de gratis beurt al gebruikt heeft
+    function checkAccess() {
+        const passExpiry = localStorage.getItem('cv_wizard_pass_expiry');
+        const usageCount = parseInt(localStorage.getItem('cv_wizard_uses') || '0');
+        const lang = document.getElementById('languageSelect').value;
+        const t = translations[lang] || translations.English;
+        const now = new Date().getTime();
+
+        const badge = document.getElementById('accessBadge');
+        const submitBtn = document.getElementById('submitBtn');
+        const paywall = document.getElementById('paywallBanner');
+
+        // 1. Controleer 7-dagen pas
+        if (passExpiry && parseInt(passExpiry) > now) {
+            badge.className = "status-badge status-pass";
+            badge.innerText = t.badgePass;
+            submitBtn.disabled = false;
+            submitBtn.innerText = t.submitBtn;
+            paywall.style.display = 'none';
+            return true;
+        }
+
+        // 2. Als de 7-dagen pas is verlopen
+        if (passExpiry && parseInt(passExpiry) <= now) {
+            badge.className = "status-badge status-expired";
+            badge.innerText = t.badgeExpired;
+            submitBtn.disabled = true;
+            submitBtn.innerText = t.btnUsed;
+            paywall.style.display = 'block';
+            return false;
+        }
+
+        // 3. Controleer gratis proefversie
+        if (usageCount >= 1) {
+            badge.className = "status-badge status-expired";
+            badge.innerText = t.btnUsed;
+            submitBtn.disabled = true;
+            submitBtn.innerText = t.btnUsed;
+            paywall.style.display = 'block';
+            return false;
+        } else {
+            badge.className = "status-badge status-free";
+            badge.innerText = t.badgeFree;
+            submitBtn.disabled = false;
+            submitBtn.innerText = t.submitBtn;
+            paywall.style.display = 'none';
+            return true;
+        }
+    }
 
     function changeLanguage() {
         const lang = document.getElementById('languageSelect').value;
@@ -424,11 +371,16 @@
         document.getElementById('cvInput').placeholder = t.phCv;
         document.getElementById('lblJob').innerText = t.lblJob;
         document.getElementById('jobInput').placeholder = t.phJob;
-        document.getElementById('submitBtn').innerText = t.submitBtn;
         document.getElementById('loading').innerText = t.loading;
         document.getElementById('resultTitle').innerText = t.resultTitle;
         document.getElementById('lblLetterHeader').innerText = t.lblLetterHeader;
         document.getElementById('lblCvHeader').innerText = t.lblCvHeader;
+        
+        document.getElementById('pwTitle').innerText = t.pwTitle;
+        document.getElementById('pwSub').innerText = t.pwSub;
+        document.getElementById('pwBtn').innerText = t.pwBtn;
+
+        checkAccess();
     }
 
     function scrollToForm() {
@@ -436,6 +388,10 @@
     }
 
     async function matchCV() {
+        if (!checkAccess()) {
+            return;
+        }
+
         const cv = document.getElementById('cvInput').value;
         const job = document.getElementById('jobInput').value;
         const language = document.getElementById('languageSelect').value;
@@ -465,6 +421,10 @@
                 return;
             }
 
+            // Gebruik ophogen na gratis generatie
+            const usageCount = parseInt(localStorage.getItem('cv_wizard_uses') || '0');
+            localStorage.setItem('cv_wizard_uses', (usageCount + 1).toString());
+
             document.getElementById('loading').style.display = 'none';
             document.getElementById('resultBox').style.display = 'block';
 
@@ -486,10 +446,27 @@
                 document.getElementById('cvCard').style.display = 'block';
             }
 
+            // Check opnieuw de status
+            checkAccess();
+
         } catch (error) {
             alert('Connection error.');
             document.getElementById('loading').style.display = 'none';
         }
+    }
+
+    // Deze functie wordt geactiveerd na betaling om 7 dagen toegang te geven
+    function grant7DaysAccess() {
+        const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+        const expiryTime = new Date().getTime() + sevenDaysInMs;
+        localStorage.setItem('cv_wizard_pass_expiry', expiryTime.toString());
+        checkAccess();
+        alert("🎉 Betaling geslaagd! Je hebt nu 7 dagen lang onbeperkt toegang!");
+    }
+
+    function startPayment() {
+        // Stuur de bezoeker direct naar jouw Stripe Checkout pagina
+        window.location.href = STRIPE_PAYMENT_LINK;
     }
 
     function copyText(elementId) {
