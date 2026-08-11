@@ -1,13 +1,12 @@
 const https = require('https');
 
 module.exports = async function (req, res) {
-    // Alleen POST verzoeken toestaan
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
     try {
-        const { cv, job, language } = req.body || {};
+        const { cv, job, language, documentType } = req.body || {};
 
         if (!cv || !job) {
             return res.status(400).json({ error: 'Please provide both CV and job description.' });
@@ -15,16 +14,25 @@ module.exports = async function (req, res) {
 
         const targetLanguage = language || 'English';
 
+        let promptInstruction = '';
+        if (documentType === 'letter') {
+            promptInstruction = 'Write ONLY a highly compelling, professional cover letter tailored to the job description.';
+        } else if (documentType === 'cv') {
+            promptInstruction = 'Generate ONLY a fully tailored, optimized Resume / CV matching the job description. Include contact info placeholder, professional summary, key skills, work experience, and education.';
+        } else {
+            promptInstruction = 'Generate BOTH: 1) A highly compelling, professional cover letter tailored to the job, AND 2) A fully tailored, optimized Resume / CV matching the job description.';
+        }
+
         const postData = JSON.stringify({
             model: 'gpt-4o-mini',
             messages: [
                 { 
                     role: 'system', 
-                    content: `You are an expert HR manager. Write a highly compelling, professional cover letter tailored to the job description and the users resume. At the end, provide 3 actionable bullet points to improve their resume for this specific job. Respond ENTIRELY in ${targetLanguage}.` 
+                    content: `You are an expert HR manager and career advisor. ${promptInstruction} Respond ENTIRELY in ${targetLanguage}. Use clear formatting with bold section headers.` 
                 },
                 { 
                     role: 'user', 
-                    content: `Resume:\n${cv}\n\nJob Description:\n${job}` 
+                    content: `User Input / Background:\n${cv}\n\nJob Description:\n${job}` 
                 }
             ]
         });
@@ -40,7 +48,6 @@ module.exports = async function (req, res) {
             }
         };
 
-        // Verzoek versturen naar OpenAI
         return new Promise((resolve) => {
             const apiReq = https.request(options, (apiRes) => {
                 let data = '';
