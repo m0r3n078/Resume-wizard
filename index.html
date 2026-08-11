@@ -4,37 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resume Wizard - AI Resume & Cover Letter Generator</title>
+    
+    <!-- Markdown Parser & PDF Generator Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
-        :root { --primary: #2563eb; --primary-hover: #1d4ed8; --bg: #f8fafc; --text: #0f172a; }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); padding: 40px 20px; margin: 0; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        :root { 
+            --primary: #2563eb; 
+            --primary-hover: #1d4ed8; 
+            --bg: #f8fafc; 
+            --text: #0f172a; 
+            --card-bg: #ffffff;
+        }
         
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            padding: 40px 20px; 
+            margin: 0; 
+            line-height: 1.6;
+        }
+
+        .container { 
+            max-width: 750px; 
+            margin: 0 auto; 
+            background: var(--card-bg); 
+            padding: 35px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01); 
+        }
+        
+        /* Language Bar */
         .lang-bar { text-align: right; margin-bottom: 20px; }
-        .lang-bar select { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; cursor: pointer; }
+        .lang-bar select { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; background: white; cursor: pointer; outline: none; }
 
-        .hero { text-align: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 2px solid #e2e8f0; }
-        .hero h1 { color: var(--primary); font-size: 30px; margin-bottom: 10px; }
+        /* Hero */
+        .hero { text-align: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 2px solid #f1f5f9; }
+        .hero h1 { color: var(--primary); font-size: 32px; margin-bottom: 8px; font-weight: 800; letter-spacing: -0.5px; }
         .hero p { font-size: 16px; color: #475569; margin-bottom: 20px; line-height: 1.5; }
-        .hero-img { width: 100%; max-height: 280px; object-fit: cover; border-radius: 10px; margin-bottom: 20px; }
-        .start-btn { display: inline-block; width: auto; padding: 12px 28px; font-size: 16px; border: none; border-radius: 8px; background-color: var(--primary); color: white; font-weight: 600; cursor: pointer; }
-        .start-btn:hover { background-color: var(--primary-hover); }
+        .hero-img { width: 100%; max-height: 260px; object-fit: cover; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .start-btn { display: inline-block; padding: 12px 30px; font-size: 16px; border: none; border-radius: 8px; background-color: var(--primary); color: white; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .start-btn:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
 
-        label { display: block; font-weight: 600; margin-bottom: 8px; margin-top: 15px; }
-        .radio-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; background: #f1f5f9; padding: 15px; border-radius: 8px; }
-        .radio-option { display: flex; align-items: center; gap: 10px; font-weight: normal; margin: 0; cursor: pointer; }
-        .radio-option input { cursor: pointer; }
-        textarea { width: 100%; height: 120px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; resize: none; box-sizing: border-box; margin-bottom: 10px; font-size: 14px; }
-        button.submit-btn { width: 100%; background-color: var(--primary); color: white; border: none; padding: 14px; font-size: 16px; font-weight: 600; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+        /* Form */
+        label { display: block; font-weight: 600; margin-bottom: 8px; margin-top: 18px; color: #334155; }
+        .radio-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; background: #f8fafc; padding: 16px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        .radio-option { display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; color: #475569; }
+        .radio-option input { accent-color: var(--primary); width: 16px; height: 16px; cursor: pointer; }
+        
+        textarea { width: 100%; height: 120px; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; resize: vertical; box-sizing: border-box; font-size: 14px; font-family: inherit; transition: border 0.2s; }
+        textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        
+        button.submit-btn { width: 100%; background-color: var(--primary); color: white; border: none; padding: 15px; font-size: 16px; font-weight: 600; border-radius: 10px; cursor: pointer; margin-top: 15px; transition: background 0.2s; }
         button.submit-btn:hover { background-color: var(--primary-hover); }
         
-        .loading { display: none; text-align: center; font-weight: 600; color: var(--primary); margin: 20px 0; }
-        .result-box { display: none; margin-top: 20px; border-top: 2px solid #e2e8f0; padding-top: 20px; }
-        .output { background: #f1f5f9; padding: 15px; border-radius: 8px; white-space: pre-wrap; border: 1px solid #e2e8f0; font-size: 14px; line-height: 1.5; }
+        .loading { display: none; text-align: center; font-weight: 600; color: var(--primary); margin: 25px 0; }
+        
+        /* Results Section */
+        .result-box { display: none; margin-top: 30px; border-top: 2px solid #f1f5f9; padding-top: 25px; }
+        
+        .output-card { 
+            background: #ffffff; 
+            padding: 25px; 
+            border-radius: 12px; 
+            border: 1px solid #e2e8f0; 
+            margin-top: 20px; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); 
+        }
+
+        /* Modern Styling voor CV */
+        .cv-card { 
+            border-left: 5px solid var(--primary); 
+            background: #fafafa;
+        }
+
+        .card-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 15px; 
+            border-bottom: 1px solid #e2e8f0; 
+            padding-bottom: 10px; 
+        }
+        .card-header h3 { margin: 0; color: var(--primary); font-size: 18px; }
+
+        .btn-group { display: flex; gap: 8px; }
+        .action-btn { 
+            background: #f1f5f9; 
+            border: 1px solid #cbd5e1; 
+            padding: 6px 12px; 
+            border-radius: 6px; 
+            font-size: 13px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+        }
+        .action-btn:hover { background: #e2e8f0; color: var(--text); }
+
+        .formatted-content h1, .formatted-content h2, .formatted-content h3 { color: #0f172a; margin-top: 15px; margin-bottom: 8px; }
+        .formatted-content ul { padding-left: 20px; }
+        .formatted-content li { margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <!-- Taalselectie -->
     <div class="lang-bar">
         <select id="languageSelect" onchange="changeLanguage()">
             <option value="English" selected>🌐 English</option>
@@ -51,6 +128,7 @@
         </select>
     </div>
 
+    <!-- Hero -->
     <div class="hero">
         <h1 id="heroTitle">Welcome to Resume Wizard</h1>
         <p id="heroSub">Land your dream job with AI-powered cover letters and personalized CV creation in seconds.</p>
@@ -59,6 +137,7 @@
         <button id="startBtn" class="start-btn" onclick="scrollToForm()">Start Your Application</button>
     </div>
 
+    <!-- Formulier -->
     <div id="applicationForm">
         <label id="lblDocType">What would you like to generate?</label>
         <div class="radio-group">
@@ -86,9 +165,33 @@
         
         <div id="loading" class="loading">AI is analyzing and writing... Please wait.</div>
         
+        <!-- Resultaten -->
         <div id="resultBox" class="result-box">
-            <h2 id="resultTitle">Your AI Generated Content</h2>
-            <div id="aiOutput" class="output"></div>
+            <h2 id="resultTitle" style="text-align: center; color: #1e293b; margin-bottom: 20px;">Your AI Generated Content</h2>
+            
+            <!-- Kaart voor Sollicitatiebrief -->
+            <div id="letterCard" class="output-card" style="display:none;">
+                <div class="card-header">
+                    <h3>✉️ <span id="lblLetterHeader">Cover Letter</span></h3>
+                    <div class="btn-group">
+                        <button class="action-btn" onclick="copyText('letterContent')">📋 Copy</button>
+                        <button class="action-btn" onclick="downloadPDF('letterCard', 'Cover_Letter.pdf')">📄 PDF</button>
+                    </div>
+                </div>
+                <div id="letterContent" class="formatted-content"></div>
+            </div>
+
+            <!-- Kaart voor CV -->
+            <div id="cvCard" class="output-card cv-card" style="display:none;">
+                <div class="card-header">
+                    <h3>📄 <span id="lblCvHeader">Tailored Resume / CV</span></h3>
+                    <div class="btn-group">
+                        <button class="action-btn" onclick="copyText('cvContent')">📋 Copy</button>
+                        <button class="action-btn" onclick="downloadPDF('cvCard', 'Tailored_CV.pdf')">📄 PDF</button>
+                    </div>
+                </div>
+                <div id="cvContent" class="formatted-content"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -110,6 +213,8 @@
             submitBtn: "Generate Document(s)",
             loading: "AI is analyzing and writing... Please wait.",
             resultTitle: "Your AI Generated Content",
+            lblLetterHeader: "Cover Letter",
+            lblCvHeader: "Tailored CV / Resume",
             alertFill: "Please fill in both fields."
         },
         Dutch: {
@@ -127,41 +232,9 @@
             submitBtn: "Genereer Documenten",
             loading: "AI is aan het analyseren en schrijven... Een moment geduld.",
             resultTitle: "Jouw Gegenereerde Inhoud",
+            lblLetterHeader: "Sollicitatiebrief",
+            lblCvHeader: "Aangepast CV / Resume",
             alertFill: "Vul alstublieft zowel je gegevens als de vacature in."
-        },
-        French: {
-            title: "Bienvenue sur Resume Wizard",
-            sub: "Décrochez le job de vos rêves grâce à des lettres de motivation et CV personnalisés générés par l'IA.",
-            startBtn: "Commencer ma candidature",
-            lblDocType: "Que souhaitez-vous générer ?",
-            optBoth: "Lettre de motivation & CV sur mesure",
-            optLetter: "Lettre de motivation uniquement",
-            optCv: "CV sur mesure uniquement",
-            lblCv: "Collez votre CV actuel ou vos infos :",
-            phCv: "Expérience professionnelle, formation, compétences...",
-            lblJob: "Collez l'offre d'emploi :",
-            phJob: "Collez le texte complet de l'annonce...",
-            submitBtn: "Générer les documents",
-            loading: "L'IA analyse et rédige... Veuillez patienter.",
-            resultTitle: "Votre contenu généré par l'IA",
-            alertFill: "Veuillez remplir les deux champs."
-        },
-        Spanish: {
-            title: "Bienvenido a Resume Wizard",
-            sub: "Consigue el trabajo de tus sueños con cartas de presentación y CVs personalizados optimizados por IA.",
-            startBtn: "Iniciar mi solicitud",
-            lblDocType: "¿Qué deseas generar?",
-            optBoth: "Ambos: Carta de Presentación y CV",
-            optLetter: "Solo Carta de Presentación",
-            optCv: "Solo CV Personalizado",
-            lblCv: "Pega tu CV actual o datos:",
-            phCv: "Experiencia laboral, educación, habilidades...",
-            lblJob: "Pega la oferta de trabajo:",
-            phJob: "Pega el texto completo de la oferta...",
-            submitBtn: "Generar Documento(s)",
-            loading: "La IA está analizando y escribiendo... Por favor espera.",
-            resultTitle: "Tu Contenido Generado por IA",
-            alertFill: "Por favor, rellena ambos campos."
         }
     };
 
@@ -183,6 +256,8 @@
         document.getElementById('submitBtn').innerText = t.submitBtn;
         document.getElementById('loading').innerText = t.loading;
         document.getElementById('resultTitle').innerText = t.resultTitle;
+        document.getElementById('lblLetterHeader').innerText = t.lblLetterHeader;
+        document.getElementById('lblCvHeader').innerText = t.lblCvHeader;
     }
 
     function scrollToForm() {
@@ -221,12 +296,49 @@
 
             document.getElementById('loading').style.display = 'none';
             document.getElementById('resultBox').style.display = 'block';
-            document.getElementById('aiOutput').innerText = data.text;
+
+            // Splits de response op basis van de kaartstructuur
+            const rawText = data.text;
+            document.getElementById('letterCard').style.display = 'none';
+            document.getElementById('cvCard').style.display = 'none';
+
+            if (documentType === 'both') {
+                const parts = rawText.split(/(?=SECTION 2:|TAILORED RESUME|AANGEPAST CV)/i);
+                document.getElementById('letterContent').innerHTML = marked.parse(parts[0] || '');
+                document.getElementById('cvContent').innerHTML = marked.parse(parts[1] || parts[0]);
+                document.getElementById('letterCard').style.display = 'block';
+                document.getElementById('cvCard').style.display = 'block';
+            } else if (documentType === 'letter') {
+                document.getElementById('letterContent').innerHTML = marked.parse(rawText);
+                document.getElementById('letterCard').style.display = 'block';
+            } else {
+                document.getElementById('cvContent').innerHTML = marked.parse(rawText);
+                document.getElementById('cvCard').style.display = 'block';
+            }
 
         } catch (error) {
             alert('Connection error.');
             document.getElementById('loading').style.display = 'none';
         }
+    }
+
+    function copyText(elementId) {
+        const text = document.getElementById(elementId).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Copied to clipboard!');
+        });
+    }
+
+    function downloadPDF(elementId, filename) {
+        const element = document.getElementById(elementId);
+        const opt = {
+            margin:       0.5,
+            filename:     filename,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
     }
 </script>
 </body>
