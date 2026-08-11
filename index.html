@@ -237,6 +237,7 @@
 </div>
 
 <script>
+    // Stripe Payment Link
     const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_14A4gz8yo8Hn9Kn90vc3m00";
 
     const translations = {
@@ -295,18 +296,15 @@
     };
 
     window.onload = function() {
-        // Controleer of de gebruiker net succesvol heeft betaald via Stripe (retour-URL)
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('paid') === 'true') {
             grant7DaysAccess();
-            // Verwijder de parameter uit de URL voor een schone weergave
             window.history.replaceState({}, document.title, window.location.pathname);
         } else {
             checkAccess();
         }
     };
 
-    // Controleer of de gebruiker 7-dagen toegang heeft óf de gratis beurt al gebruikt heeft
     function checkAccess() {
         const passExpiry = localStorage.getItem('cv_wizard_pass_expiry');
         const usageCount = parseInt(localStorage.getItem('cv_wizard_uses') || '0');
@@ -318,7 +316,6 @@
         const submitBtn = document.getElementById('submitBtn');
         const paywall = document.getElementById('paywallBanner');
 
-        // 1. Controleer 7-dagen pas
         if (passExpiry && parseInt(passExpiry) > now) {
             badge.className = "status-badge status-pass";
             badge.innerText = t.badgePass;
@@ -328,7 +325,6 @@
             return true;
         }
 
-        // 2. Als de 7-dagen pas is verlopen
         if (passExpiry && parseInt(passExpiry) <= now) {
             badge.className = "status-badge status-expired";
             badge.innerText = t.badgeExpired;
@@ -338,7 +334,6 @@
             return false;
         }
 
-        // 3. Controleer gratis proefversie
         if (usageCount >= 1) {
             badge.className = "status-badge status-expired";
             badge.innerText = t.btnUsed;
@@ -421,7 +416,6 @@
                 return;
             }
 
-            // Gebruik ophogen na gratis generatie
             const usageCount = parseInt(localStorage.getItem('cv_wizard_uses') || '0');
             localStorage.setItem('cv_wizard_uses', (usageCount + 1).toString());
 
@@ -446,7 +440,6 @@
                 document.getElementById('cvCard').style.display = 'block';
             }
 
-            // Check opnieuw de status
             checkAccess();
 
         } catch (error) {
@@ -455,7 +448,6 @@
         }
     }
 
-    // Deze functie wordt geactiveerd na betaling om 7 dagen toegang te geven
     function grant7DaysAccess() {
         const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
         const expiryTime = new Date().getTime() + sevenDaysInMs;
@@ -465,7 +457,6 @@
     }
 
     function startPayment() {
-        // Stuur de bezoeker direct naar jouw Stripe Checkout pagina
         window.location.href = STRIPE_PAYMENT_LINK;
     }
 
