@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,65 +8,85 @@
         :root { --primary: #2563eb; --primary-hover: #1d4ed8; --bg: #f8fafc; --text: #0f172a; }
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); padding: 40px 20px; margin: 0; }
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-        h1 { text-align: center; color: var(--primary); font-size: 28px; margin-bottom: 20px; }
+        
+        /* Hero Section Styling */
+        .hero { text-align: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 2px solid #e2e8f0; }
+        .hero h1 { color: var(--primary); font-size: 32px; margin-bottom: 10px; }
+        .hero p { font-size: 16px; color: #475569; margin-bottom: 20px; line-height: 1.5; }
+        .hero-img { width: 100%; max-height: 280px; object-fit: cover; border-radius: 10px; margin-bottom: 20px; }
+        .start-btn { display: inline-block; width: auto; padding: 12px 28px; font-size: 16px; text-decoration: none; border-radius: 8px; background-color: var(--primary); color: white; font-weight: 600; cursor: pointer; }
+        .start-btn:hover { background-color: var(--primary-hover); }
+
+        /* Form Styling */
         label { display: block; font-weight: 600; margin-bottom: 8px; margin-top: 15px; }
         select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; background-color: white; font-size: 14px; margin-bottom: 15px; cursor: pointer; }
         textarea { width: 100%; height: 130px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; resize: none; box-sizing: border-box; margin-bottom: 10px; font-size: 14px; }
-        button { width: 100%; background-color: var(--primary); color: white; border: none; padding: 14px; font-size: 16px; font-weight: 600; border-radius: 8px; cursor: pointer; margin-top: 10px; }
-        button:hover { background-color: var(--primary-hover); }
-        .hero-img { width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px; display: block; }
+        button.submit-btn { width: 100%; background-color: var(--primary); color: white; border: none; padding: 14px; font-size: 16px; font-weight: 600; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+        button.submit-btn:hover { background-color: var(--primary-hover); }
+        
         .loading { display: none; text-align: center; font-weight: 600; color: var(--primary); margin: 20px 0; }
         .result-box { display: none; margin-top: 20px; border-top: 2px solid #e2e8f0; padding-top: 20px; }
         .output { background: #f1f5f9; padding: 15px; border-radius: 8px; white-space: pre-wrap; border: 1px solid #e2e8f0; font-size: 14px; line-height: 1.5; }
     </style>
 </head>
 <body>
+
 <div class="container">
-    <h1>Resume Wizard</h1>
-    
-    <!-- Afbeelding -->
-    <img src="/image_2.png" alt="Sollicitatiebrief en CV illustratie" class="hero-img">
+    <!-- Welkom / Hero Sectie -->
+    <div class="hero">
+        <h1>Welcome to Resume Wizard</h1>
+        <p>Land your dream job with AI-powered cover letters and personalized CV optimization in seconds.</p>
+        <img src="/image_2.png" alt="Resume Wizard Illustration" class="hero-img">
+        <br>
+        <button class="start-btn" onclick="scrollToForm()">Start Your Application</button>
+    </div>
 
-    <!-- Taalselectie -->
-    <label for="languageSelect">Selecteer de gewenste taal / Choose language:</label>
-    <select id="languageSelect">
-        <option value="Dutch" selected>Nederlands</option>
-        <option value="English">English</option>
-        <option value="Spanish">Español (Spaans)</option>
-        <option value="German">Deutsch (Duits)</option>
-        <option value="French">Français (Frans)</option>
-        <option value="Turkish">Türkçe (Turks)</option>
-        <option value="Greek">Ελληνικά (Grieks)</option>
-        <option value="Arabic">العربية (Arabisch)</option>
-        <option value="Chinese">中文 (Chinees)</option>
-        <option value="Japanese">日本語 (Japans)</option>
-        <option value="Italian">Italiano (Italiaans)</option>
-    </select>
+    <!-- Formulier -->
+    <div id="applicationForm">
+        <label for="languageSelect">Select output language / Choose language:</label>
+        <select id="languageSelect">
+            <option value="English" selected>English</option>
+            <option value="Spanish">Español (Spanish)</option>
+            <option value="French">Français (French)</option>
+            <option value="Dutch">Nederlands (Dutch)</option>
+            <option value="German">Deutsch (German)</option>
+            <option value="Turkish">Türkçe (Turkish)</option>
+            <option value="Greek">Ελληνικά (Greek)</option>
+            <option value="Arabic">العربية (Arabic)</option>
+            <option value="Chinese">中文 (Chinese)</option>
+            <option value="Japanese">日本語 (Japanese)</option>
+            <option value="Italian">Italiano (Italian)</option>
+        </select>
 
-    <label for="cvInput">Plak je huidige CV / Resume:</label>
-    <textarea id="cvInput" placeholder="Werkervaring, opleidingen, vaardigheden..."></textarea>
-    
-    <label for="jobInput">Plak de vacaturetekst:</label>
-    <textarea id="jobInput" placeholder="Plak de volledige tekst van de vacature..."></textarea>
-    
-    <button onclick="matchCV()">Genereer Sollicitatiebrief & Tips</button>
-    
-    <div id="loading" class="loading">AI is aan het analyseren en schrijven... Een moment geduld.</div>
-    
-    <div id="resultBox" class="result-box">
-        <h2>Jouw Sollicitatiebrief & CV Tips</h2>
-        <div id="aiOutput" class="output"></div>
+        <label for="cvInput">Paste your current Resume / CV:</label>
+        <textarea id="cvInput" placeholder="Work experience, education, skills..."></textarea>
+        
+        <label for="jobInput">Paste the job description:</label>
+        <textarea id="jobInput" placeholder="Paste the full text of the job you want to apply for..."></textarea>
+        
+        <button class="submit-btn" onclick="matchCV()">Generate Cover Letter & Tips</button>
+        
+        <div id="loading" class="loading">AI is analyzing and writing... Please wait.</div>
+        
+        <div id="resultBox" class="result-box">
+            <h2>Your Optimized Cover Letter & CV Tips</h2>
+            <div id="aiOutput" class="output"></div>
+        </div>
     </div>
 </div>
 
 <script>
+    function scrollToForm() {
+        document.getElementById('applicationForm').scrollIntoView({ behavior: 'smooth' });
+    }
+
     async function matchCV() {
         const cv = document.getElementById('cvInput').value;
         const job = document.getElementById('jobInput').value;
         const language = document.getElementById('languageSelect').value;
 
         if (!cv || !job) { 
-            alert('Vul alstublieft zowel het CV als de vacature in.'); 
+            alert('Please fill in both fields.'); 
             return; 
         }
 
@@ -83,7 +103,7 @@
             const data = await response.json();
 
             if(data.error) {
-                alert('Foutmelding: ' + data.error);
+                alert('Error: ' + data.error);
                 document.getElementById('loading').style.display = 'none';
                 return;
             }
@@ -93,7 +113,7 @@
             document.getElementById('aiOutput').innerText = data.text;
 
         } catch (error) {
-            alert('Verbindingsfout. Probeer het later opnieuw.');
+            alert('Connection error. Please try again later.');
             document.getElementById('loading').style.display = 'none';
         }
     }
