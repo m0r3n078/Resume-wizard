@@ -3,17 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Wizard - AI Resume & Job Matcher</title>
+    <title>Resume Wizard - AI Resume & Cover Letter Generator</title>
     <style>
         :root { --primary: #2563eb; --primary-hover: #1d4ed8; --bg: #f8fafc; --text: #0f172a; }
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); padding: 40px 20px; margin: 0; }
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
         
-        /* Language Picker Top Bar */
         .lang-bar { text-align: right; margin-bottom: 20px; }
         .lang-bar select { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; cursor: pointer; }
 
-        /* Hero Section */
         .hero { text-align: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 2px solid #e2e8f0; }
         .hero h1 { color: var(--primary); font-size: 30px; margin-bottom: 10px; }
         .hero p { font-size: 16px; color: #475569; margin-bottom: 20px; line-height: 1.5; }
@@ -21,9 +19,11 @@
         .start-btn { display: inline-block; width: auto; padding: 12px 28px; font-size: 16px; border: none; border-radius: 8px; background-color: var(--primary); color: white; font-weight: 600; cursor: pointer; }
         .start-btn:hover { background-color: var(--primary-hover); }
 
-        /* Form */
         label { display: block; font-weight: 600; margin-bottom: 8px; margin-top: 15px; }
-        textarea { width: 100%; height: 130px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; resize: none; box-sizing: border-box; margin-bottom: 10px; font-size: 14px; }
+        .radio-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; background: #f1f5f9; padding: 15px; border-radius: 8px; }
+        .radio-option { display: flex; align-items: center; gap: 10px; font-weight: normal; margin: 0; cursor: pointer; }
+        .radio-option input { cursor: pointer; }
+        textarea { width: 100%; height: 120px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; resize: none; box-sizing: border-box; margin-bottom: 10px; font-size: 14px; }
         button.submit-btn { width: 100%; background-color: var(--primary); color: white; border: none; padding: 14px; font-size: 16px; font-weight: 600; border-radius: 8px; cursor: pointer; margin-top: 10px; }
         button.submit-btn:hover { background-color: var(--primary-hover); }
         
@@ -35,7 +35,6 @@
 <body>
 
 <div class="container">
-    <!-- Taalselectie helemaal bovenaan -->
     <div class="lang-bar">
         <select id="languageSelect" onchange="changeLanguage()">
             <option value="English" selected>🌐 English</option>
@@ -52,29 +51,43 @@
         </select>
     </div>
 
-    <!-- Welkom / Hero Sectie -->
     <div class="hero">
         <h1 id="heroTitle">Welcome to Resume Wizard</h1>
-        <p id="heroSub">Land your dream job with AI-powered cover letters and personalized CV optimization in seconds.</p>
+        <p id="heroSub">Land your dream job with AI-powered cover letters and personalized CV creation in seconds.</p>
         <img src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=80" alt="Resume Wizard Illustration" class="hero-img">
         <br>
         <button id="startBtn" class="start-btn" onclick="scrollToForm()">Start Your Application</button>
     </div>
 
-    <!-- Formulier -->
     <div id="applicationForm">
-        <label id="lblCv" for="cvInput">Paste your current Resume / CV:</label>
+        <label id="lblDocType">What would you like to generate?</label>
+        <div class="radio-group">
+            <label class="radio-option">
+                <input type="radio" name="docType" value="both" checked>
+                <span id="optBoth">Both Cover Letter & Tailored CV</span>
+            </label>
+            <label class="radio-option">
+                <input type="radio" name="docType" value="letter">
+                <span id="optLetter">Cover Letter Only</span>
+            </label>
+            <label class="radio-option">
+                <input type="radio" name="docType" value="cv">
+                <span id="optCv">Tailored CV / Resume Only</span>
+            </label>
+        </div>
+
+        <label id="lblCv" for="cvInput">Paste your current Resume or Details:</label>
         <textarea id="cvInput" placeholder="Work experience, education, skills..."></textarea>
         
         <label id="lblJob" for="jobInput">Paste the job description:</label>
         <textarea id="jobInput" placeholder="Paste the full text of the job you want to apply for..."></textarea>
         
-        <button id="submitBtn" class="submit-btn" onclick="matchCV()">Generate Cover Letter & Tips</button>
+        <button id="submitBtn" class="submit-btn" onclick="matchCV()">Generate Document(s)</button>
         
         <div id="loading" class="loading">AI is analyzing and writing... Please wait.</div>
         
         <div id="resultBox" class="result-box">
-            <h2 id="resultTitle">Your Optimized Cover Letter & CV Tips</h2>
+            <h2 id="resultTitle">Your AI Generated Content</h2>
             <div id="aiOutput" class="output"></div>
         </div>
     </div>
@@ -84,146 +97,71 @@
     const translations = {
         English: {
             title: "Welcome to Resume Wizard",
-            sub: "Land your dream job with AI-powered cover letters and personalized CV optimization in seconds.",
+            sub: "Land your dream job with AI-powered cover letters and personalized CV creation in seconds.",
             startBtn: "Start Your Application",
-            lblCv: "Paste your current Resume / CV:",
+            lblDocType: "What would you like to generate?",
+            optBoth: "Both Cover Letter & Tailored CV",
+            optLetter: "Cover Letter Only",
+            optCv: "Tailored CV / Resume Only",
+            lblCv: "Paste your current Resume or Details:",
             phCv: "Work experience, education, skills...",
             lblJob: "Paste the job description:",
             phJob: "Paste the full text of the job you want to apply for...",
-            submitBtn: "Generate Cover Letter & Tips",
+            submitBtn: "Generate Document(s)",
             loading: "AI is analyzing and writing... Please wait.",
-            resultTitle: "Your Optimized Cover Letter & CV Tips",
+            resultTitle: "Your AI Generated Content",
             alertFill: "Please fill in both fields."
         },
         Dutch: {
             title: "Welkom bij Resume Wizard",
-            sub: "Scoor jouw droombaan met AI-gegenereerde sollicitatiebrieven en CV-optimalisatie binnen enkele seconden.",
+            sub: "Scoor jouw droombaan met AI-gegenereerde sollicitatiebrieven en aangepaste CV's binnen enkele seconden.",
             startBtn: "Start Jouw Sollicitatie",
-            lblCv: "Plak je huidige CV / Resume:",
+            lblDocType: "Wat wil je laten maken?",
+            optBoth: "Zowel Sollicitatiebrief als CV",
+            optLetter: "Alleen Sollicitatiebrief",
+            optCv: "Alleen Aangepast CV / Resume",
+            lblCv: "Plak je huidige CV of Gegevens:",
             phCv: "Werkervaring, opleidingen, vaardigheden...",
             lblJob: "Plak de vacaturetekst:",
             phJob: "Plak de volledige tekst van de vacature...",
-            submitBtn: "Genereer Sollicitatiebrief & Tips",
+            submitBtn: "Genereer Documenten",
             loading: "AI is aan het analyseren en schrijven... Een moment geduld.",
-            resultTitle: "Jouw Sollicitatiebrief & CV Tips",
-            alertFill: "Vul alstublieft zowel het CV als de vacature in."
+            resultTitle: "Jouw Gegenereerde Inhoud",
+            alertFill: "Vul alstublieft zowel je gegevens als de vacature in."
         },
         French: {
             title: "Bienvenue sur Resume Wizard",
-            sub: "Décrochez le job de vos rêves grâce à des lettres de motivation et conseils CV générés par l'IA en quelques secondes.",
+            sub: "Décrochez le job de vos rêves grâce à des lettres de motivation et CV personnalisés générés par l'IA.",
             startBtn: "Commencer ma candidature",
-            lblCv: "Collez votre CV actuel :",
+            lblDocType: "Que souhaitez-vous générer ?",
+            optBoth: "Lettre de motivation & CV sur mesure",
+            optLetter: "Lettre de motivation uniquement",
+            optCv: "CV sur mesure uniquement",
+            lblCv: "Collez votre CV actuel ou vos infos :",
             phCv: "Expérience professionnelle, formation, compétences...",
             lblJob: "Collez l'offre d'emploi :",
             phJob: "Collez le texte complet de l'annonce...",
-            submitBtn: "Générer la lettre & conseils",
+            submitBtn: "Générer les documents",
             loading: "L'IA analyse et rédige... Veuillez patienter.",
-            resultTitle: "Votre lettre de motivation & conseils",
+            resultTitle: "Votre contenu généré par l'IA",
             alertFill: "Veuillez remplir les deux champs."
         },
         Spanish: {
             title: "Bienvenido a Resume Wizard",
-            sub: "Consigue el trabajo de tus sueños con cartas de presentación y consejos para tu CV optimizados por IA.",
+            sub: "Consigue el trabajo de tus sueños con cartas de presentación y CVs personalizados optimizados por IA.",
             startBtn: "Iniciar mi solicitud",
-            lblCv: "Pega tu CV actual:",
+            lblDocType: "¿Qué deseas generar?",
+            optBoth: "Ambos: Carta de Presentación y CV",
+            optLetter: "Solo Carta de Presentación",
+            optCv: "Solo CV Personalizado",
+            lblCv: "Pega tu CV actual o datos:",
             phCv: "Experiencia laboral, educación, habilidades...",
             lblJob: "Pega la oferta de trabajo:",
             phJob: "Pega el texto completo de la oferta...",
-            submitBtn: "Generar Carta y Consejos",
+            submitBtn: "Generar Documento(s)",
             loading: "La IA está analizando y escribiendo... Por favor espera.",
-            resultTitle: "Tu Carta de Presentación y Consejos",
+            resultTitle: "Tu Contenido Generado por IA",
             alertFill: "Por favor, rellena ambos campos."
-        },
-        German: {
-            title: "Willkommen bei Resume Wizard",
-            sub: "Sichern Sie sich Ihren Traumjob mit KI-generierten Anschreiben und CV-Optimierung in Sekundenschnelle.",
-            startBtn: "Bewerbung starten",
-            lblCv: "Fügen Sie Ihren aktuellen Lebenslauf ein:",
-            phCv: "Berufserfahrung, Ausbildung, Fähigkeiten...",
-            lblJob: "Fügen Sie die Stellenbeschreibung ein:",
-            phJob: "Fügen Sie den vollständigen Text der Stellenanzeige ein...",
-            submitBtn: "Anschreiben & Tipps generieren",
-            loading: "KI analysiert und schreibt... Bitte warten.",
-            resultTitle: "Ihr optimiertes Anschreiben & Tipps",
-            alertFill: "Bitte füllen Sie beide Felder aus."
-        },
-        Turkish: {
-            title: "Resume Wizard'a Hoş Geldiniz",
-            sub: "Yapay zeka destekli ön yazılar ve kişiselleştirilmiş CV optimizasyonu ile saniyeler içinde hayalinizdeki işe ulaşın.",
-            startBtn: "Başvuruyu Başlat",
-            lblCv: "Mevcut Özgeçmişinizi / CV'nizi yapıştırın:",
-            phCv: "İş deneyimi, eğitim, beceriler...",
-            lblJob: "İş ilanını yapıştırın:",
-            phJob: "Başvurmak istediğiniz iş ilanının tam metnini yapıştırın...",
-            submitBtn: "Ön Yazı ve İpuçları Oluştur",
-            loading: "Yapay zeka analiz ediyor ve yazıyor... Lütfen bekleyin.",
-            resultTitle: "Optimize Edilmiş Ön Yazınız ve CV İpuçları",
-            alertFill: "Lütfen her iki alanı da doldurun."
-        },
-        Greek: {
-            title: "Καλώς ορίσατε στο Resume Wizard",
-            sub: "Aποκτήστε τη δουλειά των ονείρων σας με συνοδευτικές επιστολές τεχνητής νοημοσύνης και βελτιστοποίηση βιογραφικού σε δευτερόλεπτα.",
-            startBtn: "Ξεκινήστε την Αίτησή σας",
-            lblCv: "Επικολλήστε το τρέχον Βιογραφικό σας:",
-            phCv: "Προϋπηρεσία, εκπαίδευση, δεξιότητες...",
-            lblJob: "Επικολλήστε την περιγραφή της θέσης εργασίας:",
-            phJob: "Επικολλήστε το πλήρες κείμενο της αγγελίας...",
-            submitBtn: "Δημιουργία Επιστολής & Συμβουλών",
-            loading: "Η Τεχνητή Νοημοσύνη αναλύει και γράφει... Παρακαλώ περιμένετε.",
-            resultTitle: "Η Συνοδευτική Επιστολή & Συμβουλές σας",
-            alertFill: "Παρακαλούμε συμπληρώστε και τα δύο πεδία."
-        },
-        Arabic: {
-            title: "Resume Wizard مرحبًا بك في",
-            sub: "احصل على وظيفة أحلامك باستخدام خطاب تغطية مدعوم بالذكاء الاصطناعي وتحسين سيرتك الذاتية في ثوانٍ.",
-            startBtn: "ابدأ تقديم طلبك",
-            lblCv: "التقط أو الصق سيرتك الذاتية الحالية:",
-            phCv: "الخبرة العملية، التعليم، المهارات...",
-            lblJob: "الصق وصف الوظيفة:",
-            phJob: "الصق النص الكامل للوظيفة التي تريد التقدم إليها...",
-            submitBtn: "إنشاء خطاب التغطية والنصائح",
-            loading: "يقوم الذكاء الاصطناعي بالتحليل والكتابة... يرجى الانتظار.",
-            resultTitle: "خطاب التغطية والنصائح المحسنة الخاصة بك",
-            alertFill: "يرجى ملء كلا الحقلين."
-        },
-        Chinese: {
-            title: "欢迎使用 Resume Wizard",
-            sub: "利用 AI 生成求职信和个性化简历优化，在数秒内获得理想工作。",
-            startBtn: "开始申请",
-            lblCv: "粘贴您当前的简历 / CV：",
-            phCv: "工作经验、教育背景、技能...",
-            lblJob: "粘贴职位描述：",
-            phJob: "粘贴您要申请的职位的完整文本...",
-            submitBtn: "生成求职信和建议",
-            loading: "AI 正在分析并撰写... 请稍候。",
-            resultTitle: "您优化的求职信和简历建议",
-            alertFill: "请填写这两个字段。"
-        },
-        Japanese: {
-            title: "Resume Wizard へようこそ",
-            sub: "AIによるカバーレターとカスタマイズされた履歴書最適化で、数秒で理想の職を手に入れましょう。",
-            startBtn: "応募を開始する",
-            lblCv: "現在の履歴書/CVを貼り付けてください：",
-            phCv: "職歴、学歴、スキル...",
-            lblJob: "求人情報を貼り付けてください：",
-            phJob: "応募したい求人の全文を貼り付けてください...",
-            submitBtn: "カバーレターとアドバイスを生成",
-            loading: "AIが分析して執筆中です... しばらくお待ちください。",
-            resultTitle: "最適化されたカバーレターと履歴書のアドバイス",
-            alertFill: "両方のフィールドを入力してください。"
-        },
-        Italian: {
-            title: "Benvenuto su Resume Wizard",
-            sub: "Ottieni il lavoro dei tuoi sogni con lettere di presentazione e ottimizzazione del CV generate dall'IA in pochi secondi.",
-            startBtn: "Inizia la Candidatura",
-            lblCv: "Incolla il tuo CV attuale:",
-            phCv: "Esperienza lavorativa, istruzione, competenze...",
-            lblJob: "Incolla la descrizione del lavoro:",
-            phJob: "Incolla il testo completo dell'offerta di lavoro...",
-            submitBtn: "Genera Lettera e Consigli",
-            loading: "L'IA sta analizzando e scrivendo... Attendere prego.",
-            resultTitle: "La tua Lettera e Consigli Ottimizzati",
-            alertFill: "Si prega di compilare entrambi i campi."
         }
     };
 
@@ -234,6 +172,10 @@
         document.getElementById('heroTitle').innerText = t.title;
         document.getElementById('heroSub').innerText = t.sub;
         document.getElementById('startBtn').innerText = t.startBtn;
+        document.getElementById('lblDocType').innerText = t.lblDocType;
+        document.getElementById('optBoth').innerText = t.optBoth;
+        document.getElementById('optLetter').innerText = t.optLetter;
+        document.getElementById('optCv').innerText = t.optCv;
         document.getElementById('lblCv').innerText = t.lblCv;
         document.getElementById('cvInput').placeholder = t.phCv;
         document.getElementById('lblJob').innerText = t.lblJob;
@@ -251,6 +193,7 @@
         const cv = document.getElementById('cvInput').value;
         const job = document.getElementById('jobInput').value;
         const language = document.getElementById('languageSelect').value;
+        const documentType = document.querySelector('input[name="docType"]:checked').value;
         const t = translations[language] || translations.English;
 
         if (!cv || !job) { 
@@ -265,7 +208,7 @@
             const response = await fetch('/api/openai-match', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cv, job, language })
+                body: JSON.stringify({ cv, job, language, documentType })
             });
 
             const data = await response.json();
