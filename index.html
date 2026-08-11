@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Wizard - AI Resume & Cover Letter Generator</title>
+    <title>CV Wizard - AI CV & Cover Letter Generator</title>
     
     <!-- Markdown Parser & PDF Generator Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -130,9 +130,9 @@
 
     <!-- Hero -->
     <div class="hero">
-        <h1 id="heroTitle">Welcome to Resume Wizard</h1>
+        <h1 id="heroTitle">Welcome to CV Wizard</h1>
         <p id="heroSub">Land your dream job with AI-powered cover letters and personalized CV creation in seconds.</p>
-        <img src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=80" alt="Resume Wizard Illustration" class="hero-img">
+        <img src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=80" alt="CV Wizard Illustration" class="hero-img">
         <br>
         <button id="startBtn" class="start-btn" onclick="scrollToForm()">Start Your Application</button>
     </div>
@@ -151,11 +151,11 @@
             </label>
             <label class="radio-option">
                 <input type="radio" name="docType" value="cv">
-                <span id="optCv">Tailored CV / Resume Only</span>
+                <span id="optCv">Tailored CV Only</span>
             </label>
         </div>
 
-        <label id="lblCv" for="cvInput">Paste your current Resume or Details:</label>
+        <label id="lblCv" for="cvInput">Paste your current CV or Details:</label>
         <textarea id="cvInput" placeholder="Work experience, education, skills..."></textarea>
         
         <label id="lblJob" for="jobInput">Paste the job description:</label>
@@ -184,7 +184,7 @@
             <!-- Kaart voor CV -->
             <div id="cvCard" class="output-card cv-card" style="display:none;">
                 <div class="card-header">
-                    <h3>📄 <span id="lblCvHeader">Tailored Resume / CV</span></h3>
+                    <h3>📄 <span id="lblCvHeader">Tailored CV</span></h3>
                     <div class="btn-group">
                         <button class="action-btn" onclick="copyText('cvContent')">📋 Copy</button>
                         <button class="action-btn" onclick="downloadPDF('cvCard', 'Tailored_CV.pdf')">📄 PDF</button>
@@ -199,14 +199,14 @@
 <script>
     const translations = {
         English: {
-            title: "Welcome to Resume Wizard",
+            title: "Welcome to CV Wizard",
             sub: "Land your dream job with AI-powered cover letters and personalized CV creation in seconds.",
             startBtn: "Start Your Application",
             lblDocType: "What would you like to generate?",
             optBoth: "Both Cover Letter & Tailored CV",
             optLetter: "Cover Letter Only",
-            optCv: "Tailored CV / Resume Only",
-            lblCv: "Paste your current Resume or Details:",
+            optCv: "Tailored CV Only",
+            lblCv: "Paste your current CV or Details:",
             phCv: "Work experience, education, skills...",
             lblJob: "Paste the job description:",
             phJob: "Paste the full text of the job you want to apply for...",
@@ -214,17 +214,17 @@
             loading: "AI is analyzing and writing... Please wait.",
             resultTitle: "Your AI Generated Content",
             lblLetterHeader: "Cover Letter",
-            lblCvHeader: "Tailored CV / Resume",
+            lblCvHeader: "Tailored CV",
             alertFill: "Please fill in both fields."
         },
         Dutch: {
-            title: "Welkom bij Resume Wizard",
+            title: "Welkom bij CV Wizard",
             sub: "Scoor jouw droombaan met AI-gegenereerde sollicitatiebrieven en aangepaste CV's binnen enkele seconden.",
             startBtn: "Start Jouw Sollicitatie",
             lblDocType: "Wat wil je laten maken?",
             optBoth: "Zowel Sollicitatiebrief als CV",
             optLetter: "Alleen Sollicitatiebrief",
-            optCv: "Alleen Aangepast CV / Resume",
+            optCv: "Alleen Aangepast CV",
             lblCv: "Plak je huidige CV of Gegevens:",
             phCv: "Werkervaring, opleidingen, vaardigheden...",
             lblJob: "Plak de vacaturetekst:",
@@ -233,8 +233,179 @@
             loading: "AI is aan het analyseren en schrijven... Een moment geduld.",
             resultTitle: "Jouw Gegenereerde Inhoud",
             lblLetterHeader: "Sollicitatiebrief",
-            lblCvHeader: "Aangepast CV / Resume",
+            lblCvHeader: "Aangepast CV",
             alertFill: "Vul alstublieft zowel je gegevens als de vacature in."
+        },
+        French: {
+            title: "Bienvenue sur CV Wizard",
+            sub: "Décrochez le job de vos rêves grâce à des lettres de motivation et CV personnalisés par l'IA.",
+            startBtn: "Commencer ma candidature",
+            lblDocType: "Que souhaitez-vous générer ?",
+            optBoth: "Lettre de motivation & CV sur mesure",
+            optLetter: "Lettre de motivation uniquement",
+            optCv: "CV sur mesure uniquement",
+            lblCv: "Collez votre CV actuel ou vos infos :",
+            phCv: "Expérience professionnelle, formation, compétences...",
+            lblJob: "Collez l'offre d'emploi :",
+            phJob: "Collez le texte complet de l'annonce...",
+            submitBtn: "Générer les documents",
+            loading: "L'IA analyse et rédige... Veuillez patienter.",
+            resultTitle: "Votre contenu généré par l'IA",
+            lblLetterHeader: "Lettre de motivation",
+            lblCvHeader: "CV sur mesure",
+            alertFill: "Veuillez remplir les deux champs."
+        },
+        Spanish: {
+            title: "Bienvenido a CV Wizard",
+            sub: "Consigue el trabajo de tus sueños con cartas de presentación y CVs personalizados por IA.",
+            startBtn: "Iniciar mi solicitud",
+            lblDocType: "¿Qué deseas generar?",
+            optBoth: "Ambos: Carta de Presentación y CV",
+            optLetter: "Solo Carta de Presentación",
+            optCv: "Solo CV Personalizado",
+            lblCv: "Pega tu CV actual o datos:",
+            phCv: "Experiencia laboral, educación, habilidades...",
+            lblJob: "Pega la oferta de trabajo:",
+            phJob: "Pega el texto completo de la oferta...",
+            submitBtn: "Generar Documento(s)",
+            loading: "La IA está analizando y escribiendo... Por favor espera.",
+            resultTitle: "Tu Contenido Generado por IA",
+            lblLetterHeader: "Carta de Presentación",
+            lblCvHeader: "CV Personalizado",
+            alertFill: "Por favor, rellena ambos campos."
+        },
+        German: {
+            title: "Willkommen bei CV Wizard",
+            sub: "Sichern Sie sich Ihren Traumjob mit KI-generierten Anschreiben und maßgeschneiderten Lebensläufen.",
+            startBtn: "Bewerbung starten",
+            lblDocType: "Was möchten Sie erstellen?",
+            optBoth: "Anschreiben & Maßgeschneiderter Lebenslauf",
+            optLetter: "Nur Anschreiben",
+            optCv: "Nur Maßgeschneiderter Lebenslauf",
+            lblCv: "Fügen Sie Ihren aktuellen Lebenslauf ein:",
+            phCv: "Berufserfahrung, Ausbildung, Fähigkeiten...",
+            lblJob: "Stellenbeschreibung einfügen:",
+            phJob: "Fügen Sie den vollständigen Text der Stellenanzeige ein...",
+            submitBtn: "Dokument(e) erstellen",
+            loading: "KI analysiert und schreibt... Bitte warten.",
+            resultTitle: "Ihre KI-generierten Inhalte",
+            lblLetterHeader: "Anschreiben",
+            lblCvHeader: "Maßgeschneiderter Lebenslauf",
+            alertFill: "Bitte füllen Sie beide Felder aus."
+        },
+        Turkish: {
+            title: "CV Wizard'a Hoş Geldiniz",
+            sub: "Yapay zeka destekli niyet mektupları ve özel CV'ler ile hayalinizdeki işe kavuşun.",
+            startBtn: "Başvuruyu Başlat",
+            lblDocType: "Ne oluşturmak istersiniz?",
+            optBoth: "Hem Niyet Mektubu Hem CV",
+            optLetter: "Sadece Niyet Mektubu",
+            optCv: "Sadece Özel CV",
+            lblCv: "Mevcut CV'nizi veya bilgilerinizi yapıştırın:",
+            phCv: "İş deneyimi, eğitim, beceriler...",
+            lblJob: "İş ilanını yapıştırın:",
+            phJob: "Başvurmak istediğiniz iş ilanının metnini yapıştırın...",
+            submitBtn: "Belge Oluştur",
+            loading: "Yapay zeka analiz ediyor ve yazıyor... Lütfen bekleyin.",
+            resultTitle: "Yapay Zeka Tarafından Oluşturulan İçerik",
+            lblLetterHeader: "Niyet Mektubu",
+            lblCvHeader: "Özel CV",
+            alertFill: "Lütfen her iki alanı da doldurun."
+        },
+        Greek: {
+            title: "Καλώς ήρθατε στο CV Wizard",
+            sub: "Αποκτήστε τη δουλειά των ονείρων σας με συνοδευτικές επιστολές και προσαρμοσμένα CV με AI.",
+            startBtn: "Ξεκινήστε την αίτηση",
+            lblDocType: "Τι θα θέλατε να δημιουργήσετε;",
+            optBoth: "Συνοδευτική Επιστολή & Προσαρμοσμένο CV",
+            optLetter: "Μόνο Συνοδευτική Επιστολή",
+            optCv: "Μόνο Προσαρμοσμένο CV",
+            lblCv: "Επικολήστε το τρέχον CV ή τις λεπτομέρειές σας:",
+            phCv: "Προϋπηρεσία, εκπαίδευση, δεξιότητες...",
+            lblJob: "Επικολήστε την περιγραφή της θέσης εργασίας:",
+            phJob: "Επικολήστε το πλήρες κείμενο της αγγελίας...",
+            submitBtn: "Δημιουργία Εγγράφων",
+            loading: "Η AI αναλύει και γράφει... Παρακαλώ περιμένετε.",
+            resultTitle: "Το Περιεχόμενο που Δημιουργήθηκε",
+            lblLetterHeader: "Συνοδευτική Επιστολή",
+            lblCvHeader: "Προσαρμοσμένο CV",
+            alertFill: "Παρακαλώ συμπληρώστε και τα δύο πεδία."
+        },
+        Arabic: {
+            title: "مرحبًا بك في CV Wizard",
+            sub: "احصل على وظيفة أحلامك مع خطابات التغطية والسير الذاتية المخصصة المدعومة بالذكاء الاصطناعي.",
+            startBtn: "ابدأ طلبك",
+            lblDocType: "ماذا تريد أن تنشئ؟",
+            optBoth: "خطاب تغطية وسيرة ذاتية مخصصة",
+            optLetter: "خطاب تغطية فقط",
+            optCv: "سيرة ذاتية مخصصة فقط",
+            lblCv: "الصق سيرتك الذاتية الحالية أو تفاصيلك:",
+            phCv: "الخبرة العملية، التعليم، المهارات...",
+            lblJob: "الصق الوصف الوظيفي:",
+            phJob: "الصق النص الكامل للوظيفة التي تريد التقدم إليها...",
+            submitBtn: "إنشاء المستندات",
+            loading: "الذكاء الاصطناعي يحلل ويكتب... يرجى الانتظار.",
+            resultTitle: "المحتوى المنشأ بواسطة الذكاء الاصطناعي",
+            lblLetterHeader: "خطاب التغطية",
+            lblCvHeader: "السيرة الذاتية المخصصة",
+            alertFill: "يرجى ملء كلا الحقلين."
+        },
+        Chinese: {
+            title: "欢迎使用 CV Wizard",
+            sub: "借助 AI 生成的求职信和个性化简历，轻松获得理想工作。",
+            startBtn: "开始申请",
+            lblDocType: "您想生成什么？",
+            optBoth: "求职信和定制简历",
+            optLetter: "仅求职信",
+            optCv: "仅定制简历",
+            lblCv: "粘贴您当前的简历或详细信息：",
+            phCv: "工作经验、教育背景、技能...",
+            lblJob: "粘贴职位描述：",
+            phJob: "粘贴您想申请的职位的全文...",
+            submitBtn: "生成文档",
+            loading: "AI 正在分析并编写... 请稍候。",
+            resultTitle: "AI 生成的内容",
+            lblLetterHeader: "求职信",
+            lblCvHeader: "定制简历",
+            alertFill: "请填写这两个字段。"
+        },
+        Japanese: {
+            title: "CV Wizard へようこそ",
+            sub: "AIが作成するカバーレターとカスタマイズされたCVで、理想の職を手に入れましょう。",
+            startBtn: "応募を開始する",
+            lblDocType: "何を作成しますか？",
+            optBoth: "カバーレターとCVの両方",
+            optLetter: "カバーレターのみ",
+            optCv: "カスタマイズされたCVのみ",
+            lblCv: "現在のCVまたは詳細を貼り付けてください：",
+            phCv: "職歴、学歴、スキル...",
+            lblJob: "求人情報を貼り付けてください：",
+            phJob: "応募したい求人の全文を貼り付けてください...",
+            submitBtn: "ドキュメントを生成",
+            loading: "AIが me 分析・執筆中です... お待ちください。",
+            resultTitle: "AI生成コンテンツ",
+            lblLetterHeader: "カバーレター",
+            lblCvHeader: "カスタマイズされたCV",
+            alertFill: "両方のフィールドに入力してください。"
+        },
+        Italian: {
+            title: "Benvenuto su CV Wizard",
+            sub: "Ottieni il lavoro dei tuoi sogni con lettere di presentazione e CV personalizzati dall'IA.",
+            startBtn: "Inizia la tua candidatura",
+            lblDocType: "Cosa vorresti generare?",
+            optBoth: "Lettera di presentazione e CV personalizzato",
+            optLetter: "Solo lettera di presentazione",
+            optCv: "Solo CV personalizzato",
+            lblCv: "Incolla il tuo CV attuale o i tuoi dettagli:",
+            phCv: "Esperienza lavorativa, istruzione, competenze...",
+            lblJob: "Incolla la descrizione del lavoro:",
+            phJob: "Incolla il testo completo dell'offerta di lavoro...",
+            submitBtn: "Genera documento/i",
+            loading: "L'IA sta analizzando e scrivendo... Attendere prego.",
+            resultTitle: "Il tuo contenuto generato dall'IA",
+            lblLetterHeader: "Lettera di presentazione",
+            lblCvHeader: "CV personalizzato",
+            alertFill: "Si prega di compilare entrambi i campi."
         }
     };
 
@@ -297,13 +468,12 @@
             document.getElementById('loading').style.display = 'none';
             document.getElementById('resultBox').style.display = 'block';
 
-            // Splits de response op basis van de kaartstructuur
             const rawText = data.text;
             document.getElementById('letterCard').style.display = 'none';
             document.getElementById('cvCard').style.display = 'none';
 
             if (documentType === 'both') {
-                const parts = rawText.split(/(?=SECTION 2:|TAILORED RESUME|AANGEPAST CV)/i);
+                const parts = rawText.split(/(?=SECTION 2:|TAILORED CV|AANGEPAST CV)/i);
                 document.getElementById('letterContent').innerHTML = marked.parse(parts[0] || '');
                 document.getElementById('cvContent').innerHTML = marked.parse(parts[1] || parts[0]);
                 document.getElementById('letterCard').style.display = 'block';
