@@ -1,70 +1,72 @@
 const https = require('https');
 
-exports.handler = async function(event, context) {
-    if (event.httpMethod !== "POST") {
-        return { statusCode: 405, body: "Method Not Allowed" };
+module.exports = async function (req, res) {
+    // Alleen POST verzoeken toestaan
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method Not Allowed' });
     }
-    
-    try {
-        // Veilig afhandelen van (eventueel base64-gecodeerde) body
-        const bodyPayload = event.isBase64Encoded 
-            ? Buffer.from(event.body, 'base64').toString('utf-8') 
-            : event.body;
 
-        const { cv, job } = JSON.parse(bodyPayload || '{}');
+    try {
+        const { cv, job, language } = req.body || {};
 
         if (!cv || !job) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ error: "Vul alstublieft zowel cv als job in." })
-            };
+            return res.status(400).json({ error: 'Please provide both CV and job description.' });
         }
-        
+
+        const targetLanguage = language || 'English';
+
         const postData = JSON.stringify({
             model: 'gpt-4o-mini',
             messages: [
-                { role: 'system', content: 'You are an expert HR manager. Write a highly compelling, professional cover letter tailored to the job description and the users resume. At the end, provide 3 actionable bullet points to improve their resume for this specific job. Respond entirely in English.' },
-                { role: 'user', content: `Resume:\n${cv}\n\nJob Description:\n${job}` }
+                { 
+                    role: 'system', 
+                    content: `You are an expert HR manager. Write a highly compelling, professional cover letter tailored to the job description and the users resume. At the end, provide 3 actionable bullet points to improve their resume for this specific job. Respond ENTIRELY in ${targetLanguage}.` 
+                },
+                { 
+                    role: 'user', 
+                    content: `Resume:\n${cv}\n\nJob Description:\n${job}` 
+                }
             ]
         });
 
-        return new Promise((resolve) => {
-            const options = {
-                hostname: 'api.openai.com', // Aangepast: Alleen het domein, geen '://'
-                path: '/v1/chat/completions',
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-                    'Content-Type': 'application/json',
-                    'Content-Length': Buffer.byteLength(postData)
-                }
-            };
+        const options = {
+            hostname: 'api.openai.com',
+            path: '/v1/chat/completions',
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(postData)
+            }
+        };
 
-            const req = https.request(options, (res) => {
+        // Verzoek versturen naar OpenAI
+        return new Promise((resolve) => {
+            const apiReq = https.request(options, (apiRes) => {
                 let data = '';
-                res.on('data', (chunk) => { data += chunk; });
-                res.on('end', () => {
-                    if (res.statusCode >= 400) {
-                        resolve({ statusCode: res.statusCode, body: data });
+                apiRes.on('data', (chunk) => { data += chunk; });
+                apiRes.on('end', () => {
+                    if (apiRes.statusCode >= 400) {
+                        res.status(apiRes.statusCode).send(data);
+                        resolve();
                     } else {
                         const responseJson = JSON.parse(data);
-                        resolve({
-                            statusCode: 200,
-                            body: JSON.stringify({ text: responseJson.choices[0].message.content })
-                        });
+                        res.status(200).json({ text: responseJson.choices[0].message.content });
+                        resolve();
                     }
                 });
             });
 
-            req.on('error', (e) => {
-                resolve({ statusCode: 500, body: JSON.stringify({ error: e.message }) });
+            apiReq.on('error', (e) => {
+                res.status(500).json({ error: e.message });
+                resolve();
             });
 
-            req.write(postData);
-            req.end();
+            apiReq.write(postData);
+            apiReq.end();
         });
 
     } catch (error) {
-        return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+        return res.status(500).json({ error: error.message });
     }
 };
