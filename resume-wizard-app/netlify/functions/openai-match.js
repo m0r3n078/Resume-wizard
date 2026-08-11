@@ -1,11 +1,11 @@
-const fetch = require('node-fetch');
-
 exports.handler = async function(event, context) {
     if (event.httpMethod !== "POST") {
         return { statusCode: 405, body: "Method Not Allowed" };
     }
     try {
         const { cv, job } = JSON.parse(event.body);
+        
+        // We gebruiken de ingebouwde fetch van Netlify, super snel en stabiel
         const response = await fetch('https://openai.com', {
             method: 'POST',
             headers: {
@@ -20,10 +20,13 @@ exports.handler = async function(event, context) {
                 ]
             })
         });
+        
         const data = await response.json();
+        
         if (data.error) {
             return { statusCode: 400, body: JSON.stringify({ error: data.error.message }) };
         }
+        
         return {
             statusCode: 200,
             body: JSON.stringify({ text: data.choices.message.content })
