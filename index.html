@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Wizard - AI Resume & Job Matcher</title>
+    <style>
+        :root { --primary: #2563eb; --primary-hover: #1d4ed8; --bg: #f8fafc; --text: #0f172a; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); padding: 40px 20px; margin: 0; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        h1 { text-align: center; color: var(--primary); font-size: 28px; margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; }
+        textarea { width: 100%; height: 150px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; resize: none; box-sizing: border-box; margin-bottom: 15px; font-size: 14px; }
+        button { width: 100%; background-color: var(--primary); color: white; border: none; padding: 14px; font-size: 16px; font-weight: 600; border-radius: 8px; cursor: pointer; }
+        button:hover { background-color: var(--primary-hover); }
+        .loading { display: none; text-align: center; font-weight: 600; color: var(--primary); margin: 20px 0; }
+        .result-box { display: none; margin-top: 20px; border-top: 2px solid #e2e8f0; padding-top: 20px; }
+        .output { background: #f1f5f9; padding: 15px; border-radius: 8px; white-space: pre-wrap; border: 1px solid #e2e8f0; font-size: 14px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Resume Wizard</h1>
+    <label for="cvInput">Paste your current Resume / CV:</label>
+    <textarea id="cvInput" placeholder="Work experience, education, skills..."></textarea>
+    <label for="jobInput">Paste the job description:</label>
+    <textarea id="jobInput" placeholder="Paste the full text of the job you want to apply for..."></textarea>
+    <button onclick="matchCV()">Optimize My Application</button>
+    <div id="loading" class="loading">AI is analyzing and writing... Please wait.</div>
+    <div id="resultBox" class="result-box">
+        <h2>Your Optimized Cover Letter & CV Tips</h2>
+        <div id="aiOutput" class="output"></div>
+    </div>
+</div>
+<script>
+    async function matchCV() {
+        const cv = document.getElementById('cvInput').value;
+        const job = document.getElementById('jobInput').value;
+        if (!cv || !job) { alert('Please fill in both fields.'); return; }
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('resultBox').style.display = 'none';
+        try {
+            const response = await fetch('/.netlify/functions/openai-match', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cv, job })
+            });
+            const data = await response.json();
+            if(data.error) {
+                alert('Error: ' + data.error);
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('resultBox').style.display = 'block';
+            document.getElementById('aiOutput').innerText = data.text;
+        } catch (error) {
+            alert('Connection error.');
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>
