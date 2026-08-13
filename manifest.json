@@ -1,0 +1,17 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "resume wizard",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "resume-wizard",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "description": "Multilingual / Meertalig:\n\nNederlands: Maak eenvoudig en snel je professionele CV.\n\nEngels: Easily and quickly create your professional CV.\n\nDuits: Erstellen Sie ganz einfach und schnell Ihren professionellen Lebenslauf.\n\nFrans: Créez facilement et rapidement votre CV professionnel.\n\nSpaans: Crea tu currículum profesional de forma fácil y rápida.\n\nArabisch: أنشئ سيرتك الذاتية الاحترافية بسهولة وسرعة.",
+  "id": "resume wizard",
+  "categories": [
+    "design",
+    "productivity"
+  ]
+}
