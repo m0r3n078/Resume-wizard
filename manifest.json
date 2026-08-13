@@ -1,17 +1,15 @@
 {
-  "name": "CV Wizard - AI CV & Cover Letter Generator",
-  "short_name": "CV Wizard",
-  "start_url": "/",
+  "background_color": "#ffffff",
+  "dir": "ltr",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#2563eb",
-  "description": "Build your dream CV with powerful AI generators and templates in seconds.",
-  "icons": [
-    {
-      "src": "https://placehold.co/512x512/2563eb/ffffff.png?text=CV",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+  "name": "resume-wizard-one.vercel",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "resume-wizard-one.vercel",
+  "start_url": "https://resume-wizard-one.vercel.app/](https://resume-wizard-one.vercel.app/",
+  "theme_color": "#ffffff",
+  "lang": "en",
+  "categories": [
+    "productivity"
   ]
 }
