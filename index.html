@@ -4,480 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CV Wizard - AI CV & Cover Letter Generator</title>
-    
+
     <!-- Markdown Parser & PDF Generator Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
+    <!-- PWA Manifest Link -->
+    <link rel="manifest" href="/manifest.json">
+
     <style>
-        :root { 
-            --primary: #2563eb; 
-            --primary-hover: #1d4ed8; 
-            --bg: #f8fafc; 
-            --text: #0f172a; 
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --text: #0f172a;
             --card-bg: #ffffff;
         }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            padding: 40px 20px; 
-            margin: 0; 
-            line-height: 1.6;
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
-        .container { 
-            max-width: 750px; 
-            margin: 0 auto; 
-            background: var(--card-bg); 
-            padding: 35px; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01); 
-        }
-        
-        /* Language Bar */
-        .lang-bar { text-align: right; margin-bottom: 20px; }
-        .lang-bar select { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; background: white; cursor: pointer; outline: none; }
-
-        /* Hero */
-        .hero { text-align: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 2px solid #f1f5f9; }
-        .hero h1 { color: var(--primary); font-size: 32px; margin-bottom: 8px; font-weight: 800; letter-spacing: -0.5px; }
-        .hero p { font-size: 16px; color: #475569; margin-bottom: 20px; line-height: 1.5; }
-        .hero-img { width: 100%; max-height: 260px; object-fit: cover; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .start-btn { display: inline-block; padding: 12px 30px; font-size: 16px; border: none; border-radius: 8px; background-color: var(--primary); color: white; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .start-btn:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
-
-        /* Status Badge */
-        .status-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-        .status-free { background-color: #e0f2fe; color: #0369a1; }
-        .status-pass { background-color: #dcfce7; color: #15803d; }
-        .status-expired { background-color: #fee2e2; color: #b91c1c; }
-
-        /* Form */
-        label { display: block; font-weight: 600; margin-bottom: 8px; margin-top: 18px; color: #334155; }
-        .radio-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; background: #f8fafc; padding: 16px; border-radius: 10px; border: 1px solid #e2e8f0; }
-        .radio-option { display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; color: #475569; }
-        .radio-option input { accent-color: var(--primary); width: 16px; height: 16px; cursor: pointer; }
-        
-        textarea { width: 100%; height: 120px; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; resize: vertical; box-sizing: border-box; font-size: 14px; font-family: inherit; transition: border 0.2s; }
-        textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        
-        button.submit-btn { width: 100%; background-color: var(--primary); color: white; border: none; padding: 15px; font-size: 16px; font-weight: 600; border-radius: 10px; cursor: pointer; margin-top: 15px; transition: background 0.2s; }
-        button.submit-btn:hover { background-color: var(--primary-hover); }
-        button.submit-btn:disabled { background-color: #94a3b8; cursor: not-allowed; }
-        
-        .loading { display: none; text-align: center; font-weight: 600; color: var(--primary); margin: 25px 0; }
-        
-        /* Paywall Banner */
-        .paywall-banner {
-            display: none;
-            background-color: #eff6ff;
-            border: 2px solid #2563eb;
-            border-radius: 12px;
-            padding: 24px;
+        .container {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            width: 100%;
+            max-width: 600px;
             text-align: center;
-            margin-top: 25px;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
-        }
-        .paywall-banner h3 { margin-top: 0; color: #1e40af; font-size: 20px; }
-        .paywall-banner p { color: #334155; margin-bottom: 15px; }
-        .pay-btn { background-color: #16a34a; color: white; border: none; padding: 14px 28px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: background 0.2s; text-decoration: none; display: inline-block; }
-        .pay-btn:hover { background-color: #15803d; }
-
-        /* Results Section */
-        .result-box { display: none; margin-top: 30px; border-top: 2px solid #f1f5f9; padding-top: 25px; }
-        
-        .output-card { 
-            background: #ffffff; 
-            padding: 25px; 
-            border-radius: 12px; 
-            border: 1px solid #e2e8f0; 
-            margin-top: 20px; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); 
         }
 
-        .cv-card { 
-            border-left: 5px solid var(--primary); 
-            background: #fafafa;
+        h1 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
         }
 
-        .card-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 15px; 
-            border-bottom: 1px solid #e2e8f0; 
-            padding-bottom: 10px; 
+        p {
+            color: #64748b;
+            margin-bottom: 2rem;
         }
-        .card-header h3 { margin: 0; color: var(--primary); font-size: 18px; }
 
-        .btn-group { display: flex; gap: 8px; }
-        .action-btn { 
-            background: #f1f5f9; 
-            border: 1px solid #cbd5e1; 
-            padding: 6px 12px; 
-            border-radius: 6px; 
-            font-size: 13px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: all 0.2s; 
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.2s;
         }
-        .action-btn:hover { background: #e2e8f0; color: var(--text); }
 
-        .formatted-content h1, .formatted-content h2, .formatted-content h3 { color: #0f172a; margin-top: 15px; margin-bottom: 8px; }
-        .formatted-content ul { padding-left: 20px; }
-        .formatted-content li { margin-bottom: 4px; }
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- Taalselectie -->
-    <div class="lang-bar">
-        <select id="languageSelect" onchange="changeLanguage()">
-            <option value="English" selected>🌐 English</option>
-            <option value="Dutch">🌐 Nederlands</option>
-            <option value="French">🌐 Français</option>
-            <option value="Spanish">🌐 Español</option>
-            <option value="German">🌐 Deutsch</option>
-            <option value="Turkish">🌐 Türkçe</option>
-            <option value="Greek">🌐 Ελληνικά</option>
-            <option value="Arabic">🌐 العربية</option>
-            <option value="Chinese">🌐 中文</option>
-            <option value="Japanese">🌐 日本語</option>
-            <option value="Italian">🌐 Italiano</option>
-        </select>
+    <div class="container">
+        <h1>Welcome to CV Wizard</h1>
+        <p>Build your dream CV with powerful AI generators and templates in seconds.</p>
+        <a href="#" class="btn">Start Your Application</a>
     </div>
 
-    <!-- Hero -->
-    <div class="hero">
-        <h1 id="heroTitle">Welcome to CV Wizard</h1>
-        <p id="heroSub">Land your dream job with AI-powered cover letters and personalized CV creation in seconds.</p>
-        <img src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=80" alt="CV Wizard Illustration" class="hero-img">
-        <br>
-        <button id="startBtn" class="start-btn" onclick="scrollToForm()">Start Your Application</button>
-    </div>
-
-    <!-- Formulier -->
-    <div id="applicationForm">
-        <div style="text-align: center;">
-            <span id="accessBadge" class="status-badge status-free">🎁 Gratis proefversie (1x)</span>
-        </div>
-
-        <label id="lblDocType">What would you like to generate?</label>
-        <div class="radio-group">
-            <label class="radio-option">
-                <input type="radio" name="docType" value="both" checked>
-                <span id="optBoth">Both Cover Letter & Tailored CV</span>
-            </label>
-            <label class="radio-option">
-                <input type="radio" name="docType" value="letter">
-                <span id="optLetter">Cover Letter Only</span>
-            </label>
-            <label class="radio-option">
-                <input type="radio" name="docType" value="cv">
-                <span id="optCv">Tailored CV Only</span>
-            </label>
-        </div>
-
-        <label id="lblCv" for="cvInput">Paste your current CV or Details:</label>
-        <textarea id="cvInput" placeholder="Work experience, education, skills..."></textarea>
-        
-        <label id="lblJob" for="jobInput">Paste the job description:</label>
-        <textarea id="jobInput" placeholder="Paste the full text of the job you want to apply for..."></textarea>
-        
-        <button id="submitBtn" class="submit-btn" onclick="matchCV()">Generate Document(s)</button>
-        
-        <!-- Paywall Melding -->
-        <div id="paywallBanner" class="paywall-banner">
-            <h3 id="pwTitle">🔒 Je gratis sessie is gebruikt!</h3>
-            <p id="pwSub">Krijg 7 dagen lang onbeperkt toegang tot het maken van CV's en sollicitatiebrieven.</p>
-            <button class="pay-btn" id="pwBtn" onclick="startPayment()">💳 Ontgrendel 7 Dagen voor €2,99</button>
-        </div>
-
-        <div id="loading" class="loading">AI is analyzing and writing... Please wait.</div>
-        
-        <!-- Resultaten -->
-        <div id="resultBox" class="result-box">
-            <h2 id="resultTitle" style="text-align: center; color: #1e293b; margin-bottom: 20px;">Your AI Generated Content</h2>
-            
-            <!-- Kaart voor Sollicitatiebrief -->
-            <div id="letterCard" class="output-card" style="display:none;">
-                <div class="card-header">
-                    <h3>✉️ <span id="lblLetterHeader">Cover Letter</span></h3>
-                    <div class="btn-group">
-                        <button class="action-btn" onclick="copyText('letterContent')">📋 Copy</button>
-                        <button class="action-btn" onclick="downloadPDF('letterCard', 'Cover_Letter.pdf')">📄 PDF</button>
-                    </div>
-                </div>
-                <div id="letterContent" class="formatted-content"></div>
-            </div>
-
-            <!-- Kaart voor CV -->
-            <div id="cvCard" class="output-card cv-card" style="display:none;">
-                <div class="card-header">
-                    <h3>📄 <span id="lblCvHeader">Tailored CV</span></h3>
-                    <div class="btn-group">
-                        <button class="action-btn" onclick="copyText('cvContent')">📋 Copy</button>
-                        <button class="action-btn" onclick="downloadPDF('cvCard', 'Tailored_CV.pdf')">📄 PDF</button>
-                    </div>
-                </div>
-                <div id="cvContent" class="formatted-content"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    // Stripe Payment Link
-    const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_14A4gz8yo8Hn9Kn90vc3m00";
-
-    const translations = {
-        English: {
-            title: "Welcome to CV Wizard",
-            sub: "Land your dream job with AI-powered cover letters and personalized CV creation in seconds.",
-            startBtn: "Start Your Application",
-            lblDocType: "What would you like to generate?",
-            optBoth: "Both Cover Letter & Tailored CV",
-            optLetter: "Cover Letter Only",
-            optCv: "Tailored CV Only",
-            lblCv: "Paste your current CV or Details:",
-            phCv: "Work experience, education, skills...",
-            lblJob: "Paste the job description:",
-            phJob: "Paste the full text of the job you want to apply for...",
-            submitBtn: "Generate Document(s)",
-            loading: "AI is analyzing and writing... Please wait.",
-            resultTitle: "Your AI Generated Content",
-            lblLetterHeader: "Cover Letter",
-            lblCvHeader: "Tailored CV",
-            alertFill: "Please fill in both fields.",
-            pwTitle: "🔒 Free Session Used!",
-            pwSub: "Get 7 days of unlimited access to generate CVs and cover letters.",
-            pwBtn: "💳 Unlock 7 Days Access for €2.99",
-            btnUsed: "Free Trial Used",
-            badgeFree: "🎁 Free Trial (1x)",
-            badgePass: "⚡ 7-Day Unlimited Access Active",
-            badgeExpired: "🔒 7-Day Access Expired"
-        },
-        Dutch: {
-            title: "Welkom bij CV Wizard",
-            sub: "Scoor jouw droombaan met AI-gegenereerde sollicitatiebrieven en aangepaste CV's binnen enkele seconden.",
-            startBtn: "Start Jouw Sollicitatie",
-            lblDocType: "Wat wil je laten maken?",
-            optBoth: "Zowel Sollicitatiebrief als CV",
-            optLetter: "Alleen Sollicitatiebrief",
-            optCv: "Alleen Aangepast CV",
-            lblCv: "Plak je huidige CV of Gegevens:",
-            phCv: "Werkervaring, opleidingen, vaardigheden...",
-            lblJob: "Plak de vacaturetekst:",
-            phJob: "Plak de volledige tekst van de vacature...",
-            submitBtn: "Genereer Documenten",
-            loading: "AI is aan het analyseren en schrijven... Een moment geduld.",
-            resultTitle: "Jouw Gegenereerde Inhoud",
-            lblLetterHeader: "Sollicitatiebrief",
-            lblCvHeader: "Aangepast CV",
-            alertFill: "Vul alstublieft zowel je gegevens als de vacature in.",
-            pwTitle: "🔒 Je gratis sessie is gebruikt!",
-            pwSub: "Krijg 7 dagen lang onbeperkt toegang tot het maken van CV's en sollicitatiebrieven.",
-            pwBtn: "💳 Ontgrendel 7 Dagen voor €2,99",
-            btnUsed: "Gratis beurt gebruikt",
-            badgeFree: "🎁 Gratis proefversie (1x)",
-            badgePass: "⚡ 7 Dagen Onbeperkt Actief",
-            badgeExpired: "🔒 7-Dagen Toegang Verlopen"
-        }
-    };
-
-    window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('paid') === 'true') {
-            grant7DaysAccess();
-            window.history.replaceState({}, document.title, window.location.pathname);
-        } else {
-            checkAccess();
-        }
-    };
-
-    function checkAccess() {
-        const passExpiry = localStorage.getItem('cv_wizard_pass_expiry');
-        const usageCount = parseInt(localStorage.getItem('cv_wizard_uses') || '0');
-        const lang = document.getElementById('languageSelect').value;
-        const t = translations[lang] || translations.English;
-        const now = new Date().getTime();
-
-        const badge = document.getElementById('accessBadge');
-        const submitBtn = document.getElementById('submitBtn');
-        const paywall = document.getElementById('paywallBanner');
-
-        if (passExpiry && parseInt(passExpiry) > now) {
-            badge.className = "status-badge status-pass";
-            badge.innerText = t.badgePass;
-            submitBtn.disabled = false;
-            submitBtn.innerText = t.submitBtn;
-            paywall.style.display = 'none';
-            return true;
-        }
-
-        if (passExpiry && parseInt(passExpiry) <= now) {
-            badge.className = "status-badge status-expired";
-            badge.innerText = t.badgeExpired;
-            submitBtn.disabled = true;
-            submitBtn.innerText = t.btnUsed;
-            paywall.style.display = 'block';
-            return false;
-        }
-
-        if (usageCount >= 1) {
-            badge.className = "status-badge status-expired";
-            badge.innerText = t.btnUsed;
-            submitBtn.disabled = true;
-            submitBtn.innerText = t.btnUsed;
-            paywall.style.display = 'block';
-            return false;
-        } else {
-            badge.className = "status-badge status-free";
-            badge.innerText = t.badgeFree;
-            submitBtn.disabled = false;
-            submitBtn.innerText = t.submitBtn;
-            paywall.style.display = 'none';
-            return true;
-        }
-    }
-
-    function changeLanguage() {
-        const lang = document.getElementById('languageSelect').value;
-        const t = translations[lang] || translations.English;
-
-        document.getElementById('heroTitle').innerText = t.title;
-        document.getElementById('heroSub').innerText = t.sub;
-        document.getElementById('startBtn').innerText = t.startBtn;
-        document.getElementById('lblDocType').innerText = t.lblDocType;
-        document.getElementById('optBoth').innerText = t.optBoth;
-        document.getElementById('optLetter').innerText = t.optLetter;
-        document.getElementById('optCv').innerText = t.optCv;
-        document.getElementById('lblCv').innerText = t.lblCv;
-        document.getElementById('cvInput').placeholder = t.phCv;
-        document.getElementById('lblJob').innerText = t.lblJob;
-        document.getElementById('jobInput').placeholder = t.phJob;
-        document.getElementById('loading').innerText = t.loading;
-        document.getElementById('resultTitle').innerText = t.resultTitle;
-        document.getElementById('lblLetterHeader').innerText = t.lblLetterHeader;
-        document.getElementById('lblCvHeader').innerText = t.lblCvHeader;
-        
-        document.getElementById('pwTitle').innerText = t.pwTitle;
-        document.getElementById('pwSub').innerText = t.pwSub;
-        document.getElementById('pwBtn').innerText = t.pwBtn;
-
-        checkAccess();
-    }
-
-    function scrollToForm() {
-        document.getElementById('applicationForm').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    async function matchCV() {
-        if (!checkAccess()) {
-            return;
-        }
-
-        const cv = document.getElementById('cvInput').value;
-        const job = document.getElementById('jobInput').value;
-        const language = document.getElementById('languageSelect').value;
-        const documentType = document.querySelector('input[name="docType"]:checked').value;
-        const t = translations[language] || translations.English;
-
-        if (!cv || !job) { 
-            alert(t.alertFill); 
-            return; 
-        }
-
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('resultBox').style.display = 'none';
-
-        try {
-            const response = await fetch('/api/openai-match', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cv, job, language, documentType })
-            });
-
-            const data = await response.json();
-
-            if(data.error) {
-                alert('Error: ' + data.error);
-                document.getElementById('loading').style.display = 'none';
-                return;
-            }
-
-            const usageCount = parseInt(localStorage.getItem('cv_wizard_uses') || '0');
-            localStorage.setItem('cv_wizard_uses', (usageCount + 1).toString());
-
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('resultBox').style.display = 'block';
-
-            const rawText = data.text;
-            document.getElementById('letterCard').style.display = 'none';
-            document.getElementById('cvCard').style.display = 'none';
-
-            if (documentType === 'both') {
-                const parts = rawText.split(/(?=SECTION 2:|TAILORED CV|AANGEPAST CV)/i);
-                document.getElementById('letterContent').innerHTML = marked.parse(parts[0] || '');
-                document.getElementById('cvContent').innerHTML = marked.parse(parts[1] || parts[0]);
-                document.getElementById('letterCard').style.display = 'block';
-                document.getElementById('cvCard').style.display = 'block';
-            } else if (documentType === 'letter') {
-                document.getElementById('letterContent').innerHTML = marked.parse(rawText);
-                document.getElementById('letterCard').style.display = 'block';
-            } else {
-                document.getElementById('cvContent').innerHTML = marked.parse(rawText);
-                document.getElementById('cvCard').style.display = 'block';
-            }
-
-            checkAccess();
-
-        } catch (error) {
-            alert('Connection error.');
-            document.getElementById('loading').style.display = 'none';
-        }
-    }
-
-    function grant7DaysAccess() {
-        const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
-        const expiryTime = new Date().getTime() + sevenDaysInMs;
-        localStorage.setItem('cv_wizard_pass_expiry', expiryTime.toString());
-        checkAccess();
-        alert("🎉 Betaling geslaagd! Je hebt nu 7 dagen lang onbeperkt toegang!");
-    }
-
-    function startPayment() {
-        window.location.href = STRIPE_PAYMENT_LINK;
-    }
-
-    function copyText(elementId) {
-        const text = document.getElementById(elementId).innerText;
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Copied to clipboard!');
-        });
-    }
-
-    function downloadPDF(elementId, filename) {
-        const element = document.getElementById(elementId);
-        const opt = {
-            margin:       0.5,
-            filename:     filename,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
-    }
-</script>
 </body>
 </html>
